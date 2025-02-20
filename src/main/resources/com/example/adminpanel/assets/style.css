@@ -3,16 +3,6 @@
     src: url('fonts/GoodDog.otf');
 }
 
-.jopa {
-    -fx-border-width: 5px;
-    -fx-border-radius: 50px;
-    -fx-border-color: #a5a5a5;
-    -fx-background-color: #c4c4c4;
-    -fx-background-radius: 50;
-    -fx-font-family: "GoodDog";
-    -fx-font-size: 36;
-}
-
 .logo {
     -fx-background-image: url("icons/logo.png");
 }
@@ -29,5 +19,50 @@
 }
 
 .exitButton:hover {
+    -fx-background-color: #c4c4c4;
+}
+
+.newUserIcon {
+    -fx-background-image: url("icons/newUser.png");
+}
+
+.newUserButtonText {
+    -fx-background-color:transparent;
+    -fx-font-family: "Arial";
+    -fx-font-size: 24;
+    -fx-text-fill: black;
+}
+
+.newUserButton:hover {
+    -fx-background-color: #c4c4c4;
+}
+
+.userControlIcon {
+    -fx-background-image: url("icons/userControl.png");
+}
+
+.userControlButtonText {
+    -fx-background-color:transparent;
+    -fx-font-family: "Arial";
+    -fx-font-size: 24;
+    -fx-text-fill: black;
+}
+
+.userControl:hover {
+    -fx-background-color: #c4c4c4;
+}
+
+.groupControlIcon {
+    -fx-background-image: url("icons/groupControl.png");
+}
+
+.groupControlButtonText {
+    -fx-background-color:transparent;
+    -fx-font-family: "Arial";
+    -fx-font-size: 24;
+    -fx-text-fill: black;
+}
+
+.groupControl:hover {
     -fx-background-color: #c4c4c4;
 }
