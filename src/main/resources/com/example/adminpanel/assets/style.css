@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Trispace';
+    font-style:  normal;
+    font-weight: 400;
+    src: url("fonts/Trispace.otf") format("otf");
+}
+
+@font-face {
+    font-family: 'GoodDog';
+    src: url('fonts/GoodDog.otf');
+
+}
+
+.button {
+    -fx-border-width: 5px;
+    -fx-border-radius: 50px;
+    -fx-border-color: #a5a5a5;
+    -fx-background-color: #c4c4c4;
+    -fx-background-radius: 50;
+
+    -fx-font-family: "GoodDog";
+    -fx-font-size: 36;
+}
