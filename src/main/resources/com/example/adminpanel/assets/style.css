@@ -66,3 +66,7 @@
 .groupControl:hover {
     -fx-background-color: #c4c4c4;
 }
+
+.imageStart {
+    -fx-background-image: url("icons/imageStart.png");
+}

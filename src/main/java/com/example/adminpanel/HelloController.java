@@ -4,5 +4,4 @@ public class HelloController {
     protected void onExitButtonClick() {
         System.exit(0);
     }
-
 }

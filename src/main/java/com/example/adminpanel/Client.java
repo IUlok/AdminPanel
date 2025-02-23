@@ -3,20 +3,27 @@ package com.example.adminpanel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
-public class Client extends BorderPane {
+public class Client extends GridPane {
+    private BorderPane rightPanel = new BorderPane();
+
     public Client() {
-        // Конфигурация боковой панели
+        // Конфигурация панели меню
         BorderPane leftPanel = new BorderPane();
         leftPanel.setPrefHeight(768);
         leftPanel.setPrefWidth(400);
         leftPanel.setStyle("-fx-background-color: #7a7a7a;");
-        HelloController controller = new HelloController();
+        add(leftPanel, 0, 0);
+
+        // Концигурация панели параметров
+        rightPanel.setPrefHeight(768);
+        rightPanel.setPrefWidth(880);
+        Pane imageStart = new Pane();
+        imageStart.getStyleClass().add("imageStart");
+        rightPanel.setCenter(imageStart);
+        add(rightPanel, 1, 0);
 
         // Логотип
         FlowPane logoPane = new FlowPane();
@@ -28,7 +35,6 @@ public class Client extends BorderPane {
         logo.getStyleClass().add("logo");
         logoPane.getChildren().add(logo);
         leftPanel.setTop(logoPane);
-        setLeft(leftPanel);
 
         // Кнопка "Выйти"
         FlowPane exitButtonPane = new FlowPane();
@@ -43,7 +49,7 @@ public class Client extends BorderPane {
         exitButton.getStyleClass().add("exitButtonText");
         exitButtonPane.getChildren().add(exitIcon);
         exitButtonPane.getChildren().add(exitButton);
-        exitButtonPane.setOnMouseClicked(e -> controller.onExitButtonClick());
+        exitButtonPane.setOnMouseClicked(e -> System.exit(0));
         leftPanel.setBottom(exitButtonPane);
 
         // Меню кнопок
@@ -61,6 +67,7 @@ public class Client extends BorderPane {
         newUserButton.getStyleClass().add("newUserButtonText");
         newUserButtonPane.getChildren().add(newUserIcon);
         newUserButtonPane.getChildren().add(newUserButton);
+        newUserButtonPane.setOnMouseClicked(e -> {getChildren().remove(rightPanel); rightPanel = new BorderPane(); onNewUserButtonClick(rightPanel);});
 
         // Кнопка "Пользователи"
         FlowPane userControlPane = new FlowPane();
@@ -75,6 +82,7 @@ public class Client extends BorderPane {
         userControlButton.getStyleClass().add("userControlButtonText");
         userControlPane.getChildren().add(userControlIcon);
         userControlPane.getChildren().add(userControlButton);
+        userControlPane.setOnMouseClicked(e -> {getChildren().remove(rightPanel); rightPanel = new BorderPane(); onUserControlButtonClick(rightPanel);});
 
         // Кнопка "Группы"
         FlowPane groupControlPane = new FlowPane();
@@ -89,6 +97,7 @@ public class Client extends BorderPane {
         groupControlButton.getStyleClass().add("groupControlButtonText");
         groupControlPane.getChildren().add(groupControlIcon);
         groupControlPane.getChildren().add(groupControlButton);
+        groupControlPane.setOnMouseClicked(e -> {getChildren().remove(rightPanel); rightPanel = new BorderPane(); onGroupControlButtonClick(rightPanel);});
 
         // Группа кнопок
         VBox toolbarMenu = new VBox();
@@ -98,4 +107,36 @@ public class Client extends BorderPane {
         toolbarMenu.getChildren().add(groupControlPane);
         leftPanel.setCenter(toolbarMenu);
     }
+
+    protected void onNewUserButtonClick(BorderPane rightPanel) {
+        rightPanel.setPrefHeight(768);
+        rightPanel.setPrefWidth(880);
+        FlowPane ChoicePane = new FlowPane();
+        ChoicePane.setAlignment(Pos.CENTER);
+        ChoicePane.setPadding(new Insets(30,0,30,0));
+        Label logo = new Label();
+        logo.setMinWidth(375);
+        logo.setMinHeight(100);
+        logo.getStyleClass().add("logo");
+        ChoicePane.getChildren().add(logo);
+        rightPanel.setTop(ChoicePane);
+        add(rightPanel, 1, 0);
+    }
+
+    protected void onUserControlButtonClick(BorderPane rightPanel) {
+        rightPanel.setPrefHeight(768);
+        rightPanel.setPrefWidth(880);
+        Button gavno = new Button("hello2");
+        rightPanel.setCenter(gavno);
+        add(rightPanel, 1, 0);
+    }
+
+    protected void onGroupControlButtonClick(BorderPane rightPanel) {
+        rightPanel.setPrefHeight(768);
+        rightPanel.setPrefWidth(880);
+        Button gavno = new Button("hello3");
+        rightPanel.setCenter(gavno);
+        add(rightPanel, 1, 0);
+    }
+
 }
