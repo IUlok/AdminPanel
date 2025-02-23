@@ -14,7 +14,7 @@ public class HelloApplication extends Application {
         GridPane client = new Client();
         Scene scene = new Scene(client, 1280, 768);
         scene.getStylesheets().add((HelloApplication.class.getResource("assets/style.css")).toString());
-        stage.setTitle("EduChat Admin");
+        stage.setTitle("Nefesle Admin");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.initStyle(StageStyle.TRANSPARENT);
