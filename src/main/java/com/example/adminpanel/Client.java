@@ -231,8 +231,8 @@ public class Client extends GridPane {
                     ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
                     ComboBox<String> degreeBox = new ComboBox<String>(degree);
 
-                    inputForm.add(firstName, 1, 1);
-                    inputForm.add(lastName, 1, 2);
+                    inputForm.add(lastName, 1, 1);
+                    inputForm.add(firstName, 1, 2);
                     inputForm.add(thirdName, 1, 3);
                     inputForm.add(startingUsingAccountDate, 1, 4);
                     inputForm.add(endingUsingAccountDate, 1, 5);
@@ -290,8 +290,8 @@ public class Client extends GridPane {
                     ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
                     ComboBox<String> compensationBox = new ComboBox<String>(compensation);
 
-                    inputForm.add(firstName, 1, 1);
-                    inputForm.add(lastName, 1, 2);
+                    inputForm.add(lastName, 1, 1);
+                    inputForm.add(firstName, 1, 2);
                     inputForm.add(thirdName, 1, 3);
                     inputForm.add(group, 1, 4);
                     inputForm.add(startingUsingAccountDate, 1, 5);
