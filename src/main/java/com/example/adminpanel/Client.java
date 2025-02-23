@@ -1,14 +1,17 @@
 package com.example.adminpanel;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.*;
-
-import java.awt.*;
+import javafx.scene.control.TextField;
 
 public class Client extends GridPane {
     private BorderPane rightPanel = new BorderPane();
@@ -164,15 +167,53 @@ public class Client extends GridPane {
         studentChoice.setAlignment(Pos.CENTER);
         studentChoice.getStyleClass().remove("radio-button");
         ToggleGroup choiceButtons = new ToggleGroup();
+        studentChoice.getStyleClass().add("studentChoice");
         prepodChoice.getStyleClass().add("prepodChoice");
-        studentChoice.getStyleClass().add("studentChoice1");
-        studentChoice.setSelected(true);
         studentChoice.setToggleGroup(choiceButtons);
         prepodChoice.setToggleGroup(choiceButtons);
         ChoicePane.getChildren().addAll(studentChoice, prepodChoice);
         ChoiceBox.getChildren().add(ChoicePane);
         rightPanel.setTop(ChoiceBox);
         add(rightPanel, 1, 0);
+
+        studentChoice.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isNowSelected) {
+                GridPane inputForm;
+                if(isNowSelected) {
+                    // Выбор студент: Изменение стилей
+                    studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
+                    prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
+                    studentChoice.getStyleClass().add("studentChoice1");
+                    prepodChoice.getStyleClass().add("prepodChoice");
+
+                    // Форма заполнения студента
+                    inputForm = new GridPane();
+                    inputForm.setAlignment(Pos.CENTER);
+                    inputForm.setHgap(10);
+                    inputForm.setVgap(10);
+                    inputForm.setPadding(new Insets(25, 25, 25, 25));
+                    TextField test = new TextField();
+                    inputForm.add(test, 1, 1);
+                    rightPanel.setCenter(inputForm);
+
+                }
+                else {
+                    // Выбор Преподаватель: Изменение стилей
+                    studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
+                    prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
+                    prepodChoice.getStyleClass().add("prepodChoice1");
+                    studentChoice.getStyleClass().add("studentChoice");
+
+                    // Форма заполнения преподавателя
+                    inputForm = new GridPane();
+
+                    // кодик
+
+                    rightPanel.setCenter(inputForm);
+                }
+            }
+        });
     }
 
     protected void onUserControlButtonClick(BorderPane rightPanel) {
