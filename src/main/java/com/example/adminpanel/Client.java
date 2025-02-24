@@ -1,30 +1,32 @@
 package com.example.adminpanel;
 
-import javafx.animation.AnimationTimer;
+import com.example.adminpanel.entity.User;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.swing.*;
+import com.example.adminpanel.http.HttpUtil;
+
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Client extends GridPane {
     private BorderPane rightPanel = new BorderPane();
     private BorderPane leftPanel = new BorderPane();
     Stage dialogStage = new Stage();
 
+    private HttpUtil httpUtil = new HttpUtil();
+    
     public Client() {
         // Конфигурация панели меню
         leftPanel.setPrefHeight(768);
@@ -275,46 +277,81 @@ public class Client extends GridPane {
 
                     TextField firstName = new TextField();
                     TextField lastName = new TextField();
-                    TextField thirdName = new TextField();
-                    TextField group = new TextField();
+                    TextField patronymic = new TextField();
+
+                    // Получение списка имён групп
+                    List<String> groups =  httpUtil.getGroupNames();
+                    ObservableList<String> groupOL = FXCollections.observableArrayList(groups);
+                    ComboBox<String> groupSelect = new ComboBox<>(groupOL);
+
                     DatePicker startingUsingAccountDate = new DatePicker();
                     DatePicker endingUsingAccountDate = new DatePicker();
 
                     firstName.setPromptText("Имя");
                     lastName.setPromptText("Фамилия");
-                    thirdName.setPromptText("Отчество");
-                    group.setPromptText("Номер группы");
+                    patronymic.setPromptText("Отчество");
                     startingUsingAccountDate.setValue(LocalDate.now());
                     endingUsingAccountDate.setValue(LocalDate.now());
 
                     ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
                     ComboBox<String> compensationBox = new ComboBox<String>(compensation);
+                    
+                    Text errorInfo = new Text();
+                    errorInfo.setFill(Color.RED);
 
-                    inputForm.add(lastName, 1, 1);
-                    inputForm.add(firstName, 1, 2);
-                    inputForm.add(thirdName, 1, 3);
-                    inputForm.add(group, 1, 4);
-                    inputForm.add(startingUsingAccountDate, 1, 5);
-                    inputForm.add(endingUsingAccountDate, 1, 6);
-                    inputForm.add(compensationBox, 1, 7);
+                    inputForm.add(lastName, 0, 0);
+                    inputForm.add(firstName, 0, 1);
+                    inputForm.add(patronymic, 0, 2);
+                    inputForm.add(groupSelect, 0, 3);
+                    inputForm.add(startingUsingAccountDate, 0, 4);
+                    inputForm.add(endingUsingAccountDate, 0, 5);
+                    inputForm.add(compensationBox, 0, 6);
+                    inputForm.add(errorInfo, 0, 7);
 
                     rightPanel.setCenter(inputForm);
 
                     Button sendButton = new Button("Создать");
+                    
                     FlowPane sendPane = new FlowPane(sendButton);
                     sendPane.setAlignment(Pos.CENTER);
                     sendPane.setPadding(new Insets(0, 0, 50, 0));
                     rightPanel.setBottom(sendPane);
 
                     sendButton.setOnAction(e -> {
-                        // Событие для кнопки создать
+                    	List<String> unfilledFields = new ArrayList<>();
+                        if(lastName.getText().isBlank()) {
+                        	unfilledFields.add("Фамилия");
+                        }
+                        if(firstName.getText().isBlank()) {
+                        	unfilledFields.add("Имя");
+                        }
+                        if(groupSelect.getValue() == null) {
+                        	unfilledFields.add("Группа");
+                        }
+
+                        if(!unfilledFields.isEmpty()) {
+                            errorInfo.setText("Необходимо заполнить поле " + unfilledFields.getFirst());
+                            return;
+                        }
+
+                        User newUser = new User();
+                        newUser.setFirstName(firstName.getText());
+                        newUser.setLastName(lastName.getText());
+                        newUser.setPatronymic(patronymic.getText());
+                        newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
+                        newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
+                        newUser.setRole("student");
+                        newUser.setGroupName(groupSelect.getValue());
+                        newUser.setReimbursement(compensationBox.getValue());
+
+                        System.out.println(httpUtil.saveNewUser(newUser));
                     });
 
                 }
             }
         });
     }
-
+     
     protected void onUserControlButtonClick(BorderPane rightPanel) {
         rightPanel.setPrefHeight(768);
         rightPanel.setPrefWidth(880);

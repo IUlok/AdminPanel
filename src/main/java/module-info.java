@@ -1,17 +1,11 @@
-module com.example.adminpanel {
+module AdminPanel {
+    requires com.google.gson;
+    requires java.net.http;
     requires javafx.controls;
-    requires javafx.fxml;
-    requires javafx.web;
+    requires javafx.graphics;
+    requires static lombok;
+    requires java.sql;
 
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.bootstrapfx.core;
-    requires eu.hansolo.tilesfx;
-    requires com.almasb.fxgl.all;
-    requires java.desktop;
-
-    opens com.example.adminpanel to javafx.fxml;
-    exports com.example.adminpanel;
+    exports com.example.adminpanel to javafx.graphics;
+    opens com.example.adminpanel.entity to com.google.gson;
 }
