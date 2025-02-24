@@ -11,6 +11,9 @@ module com.example.adminpanel {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+	requires java.net.http;
+	requires gson;
+	requires lombok;
 
     opens com.example.adminpanel to javafx.fxml;
     exports com.example.adminpanel;
