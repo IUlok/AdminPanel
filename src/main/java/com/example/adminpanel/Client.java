@@ -1,31 +1,24 @@
 package com.example.adminpanel;
 
-import javafx.animation.AnimationTimer;
+import com.example.adminpanel.entity.User;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import javax.swing.*;
 
 import com.example.adminpanel.http.HttpUtil;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Client extends GridPane {
     private BorderPane rightPanel = new BorderPane();
@@ -285,16 +278,18 @@ public class Client extends GridPane {
                     TextField firstName = new TextField();
                     TextField lastName = new TextField();
                     TextField patronymic = new TextField();
-                    TextField group = new TextField();
-                    httpUtil.getGroupNames();
-                    
+
+                    // Получение списка имён групп
+                    List<String> groups =  httpUtil.getGroupNames();
+                    ObservableList<String> groupOL = FXCollections.observableArrayList(groups);
+                    ComboBox<String> groupSelect = new ComboBox<>(groupOL);
+
                     DatePicker startingUsingAccountDate = new DatePicker();
                     DatePicker endingUsingAccountDate = new DatePicker();
 
                     firstName.setPromptText("Имя");
                     lastName.setPromptText("Фамилия");
                     patronymic.setPromptText("Отчество");
-                    group.setPromptText("Номер группы");
                     startingUsingAccountDate.setValue(LocalDate.now());
                     endingUsingAccountDate.setValue(LocalDate.now());
 
@@ -307,7 +302,7 @@ public class Client extends GridPane {
                     inputForm.add(lastName, 0, 0);
                     inputForm.add(firstName, 0, 1);
                     inputForm.add(patronymic, 0, 2);
-                    inputForm.add(group, 0, 3);
+                    inputForm.add(groupSelect, 0, 3);
                     inputForm.add(startingUsingAccountDate, 0, 4);
                     inputForm.add(endingUsingAccountDate, 0, 5);
                     inputForm.add(compensationBox, 0, 6);
@@ -330,14 +325,26 @@ public class Client extends GridPane {
                         if(firstName.getText().isBlank()) {
                         	unfilledFields.add("Имя");
                         }
-                        if(group.getText().isBlank()) {
+                        if(groupSelect.getValue() == null) {
                         	unfilledFields.add("Группа");
                         }
-                        if(lastName.getText().isBlank()) {
-                        	unfilledFields.add("Фамилия");
+
+                        if(!unfilledFields.isEmpty()) {
+                            errorInfo.setText("Необходимо заполнить поле " + unfilledFields.getFirst());
+                            return;
                         }
-                        
-                        
+
+                        User newUser = new User();
+                        newUser.setFirstName(firstName.getText());
+                        newUser.setLastName(lastName.getText());
+                        newUser.setPatronymic(patronymic.getText());
+                        newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
+                        newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
+                        newUser.setRole("student");
+                        newUser.setGroupName(groupSelect.getValue());
+                        newUser.setReimbursement(compensationBox.getValue());
+
+                        System.out.println(httpUtil.saveNewUser(newUser));
                     });
 
                 }
