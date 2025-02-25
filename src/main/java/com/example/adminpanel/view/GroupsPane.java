@@ -23,6 +23,9 @@ public class GroupsPane extends VBox {
     private ComboBox<String> programType;
     private final TextField program = new TextField("Направление подготовки");
     private ComboBox<String> studyForm;
+    private TableView<Group> table;
+
+    private Group selectedGroup;
 
     public GroupsPane() {
 
@@ -31,7 +34,7 @@ public class GroupsPane extends VBox {
         StackPane stackPane = new StackPane();
 
         ObservableList<Group> groups = FXCollections.observableArrayList(groupList);
-        TableView<Group> table = new TableView<>(groups);
+        table = new TableView<>(groups);
         table.setPrefWidth(400);
         table.setPrefHeight(500);
 
@@ -66,6 +69,7 @@ public class GroupsPane extends VBox {
                 "Заочная");
         studyForm = new ComboBox<>(studyFormList);
 
+        formPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         formPane.add(new Text("Название группы"), 0, 0);
         formPane.add(groupName, 1, 0);
         formPane.add(new Text("Факультет"), 0, 1);
@@ -77,7 +81,50 @@ public class GroupsPane extends VBox {
         formPane.add(new Text("Форма обучения"), 0, 4);
         formPane.add(studyForm, 1, 4);
 
-        //stackPane.getChildren().add(formPane);
+        Button saveButton = new Button("Сохранить группу");
+        saveButton.setOnAction(e -> {
+            Group group = new Group();
+            group.setId(selectedGroup.getId());
+            group.setName(groupName.getText());
+            group.setFaculty(faculty.getValue());
+            group.setProgramType(programType.getValue());
+            group.setProgram(program.getText());
+            group.setStudyForm(studyForm.getValue());
+
+            System.out.println(httpUtil.saveGroup(group));
+            formPane.setVisible(false);
+            reloadGroups();
+        });
+
+        formPane.add(saveButton, 0, 5);
+        formPane.setVisible(false);
+        stackPane.getChildren().add(formPane);
+
+        table.setRowFactory(tv -> {
+            TableRow<Group> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if(e.getClickCount() == 2 && !(row.isEmpty())) {
+                    Group group = row.getItem();
+                    selectedGroup = group;
+
+                    groupName.setText(group.getName());
+                    faculty.setValue(group.getFaculty());
+                    programType.setValue(group.getProgramType());
+                    program.setText(group.getProgram());
+                    studyForm.setValue(group.getStudyForm());
+                    formPane.setVisible(true);
+                }
+            });
+            return row;
+        });
+
+
         getChildren().add(stackPane);
+    }
+
+    private void reloadGroups() {
+        List<Group> newGroupList = httpUtil.getGroups(20);
+        table.getItems().clear();
+        table.getItems().addAll(newGroupList);
     }
 }

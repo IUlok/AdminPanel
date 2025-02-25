@@ -93,4 +93,22 @@ public class HttpUtil {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public boolean saveGroup(Group group) {
+		try {
+			String groupJson = new Gson().toJson(group);
+
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/group/"))
+					.header("Content-type", "application/json")
+					.POST(HttpRequest.BodyPublishers.ofString(groupJson))
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+			return response.statusCode() == 200;
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
