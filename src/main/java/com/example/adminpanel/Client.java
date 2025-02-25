@@ -1,6 +1,8 @@
 package com.example.adminpanel;
 
 import com.example.adminpanel.entity.User;
+import com.example.adminpanel.view.GroupsPane;
+import com.example.adminpanel.view.NewUserPane;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -21,11 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Client extends GridPane {
-    private BorderPane rightPanel = new BorderPane();
+    private Pane rightPanel = new BorderPane();
     private BorderPane leftPanel = new BorderPane();
     Stage dialogStage = new Stage();
-
-    private HttpUtil httpUtil = new HttpUtil();
     
     public Client() {
         // Конфигурация панели меню
@@ -34,12 +34,12 @@ public class Client extends GridPane {
         leftPanel.setStyle("-fx-background-color: #7a7a7a;");
         add(leftPanel, 0, 0);
 
-        // Концигурация панели параметров
+        // Конфигурация панели параметров
         rightPanel.setPrefHeight(768);
         rightPanel.setPrefWidth(880);
         Pane imageStart = new Pane();
         imageStart.getStyleClass().add("imageStart");
-        rightPanel.setCenter(imageStart);
+        ((BorderPane) rightPanel).setCenter(imageStart);
         add(rightPanel, 1, 0);
 
         // Логотип
@@ -120,236 +120,41 @@ public class Client extends GridPane {
 
         newUserButtonPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
-            rightPanel = new BorderPane();
-            onNewUserButtonClick(rightPanel);
+            rightPanel = new NewUserPane();
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
             userControlPane.getStyleClass().removeAll("userControl", "userControl1");
             groupControlPane.getStyleClass().removeAll("groupControl", "groupControl1");
             newUserButtonPane.getStyleClass().add("newUserButton1");
             userControlPane.getStyleClass().add("userControl");
             groupControlPane.getStyleClass().add("groupControl");
+            add(rightPanel, 1, 0);
         });
 
         userControlPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
-            rightPanel = new BorderPane();
-            onUserControlButtonClick(rightPanel);
+            rightPanel = new NewUserPane();
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
             userControlPane.getStyleClass().removeAll("userControl", "userControl1");
             groupControlPane.getStyleClass().removeAll("groupControl", "groupControl1");
             newUserButtonPane.getStyleClass().add("newUserButton");
             userControlPane.getStyleClass().add("userControl1");
             groupControlPane.getStyleClass().add("groupControl");
+            add(rightPanel, 1, 0);
         });
 
         groupControlPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
-            rightPanel = new BorderPane();
-            onGroupControlButtonClick(rightPanel);
+            rightPanel = new GroupsPane();
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
             userControlPane.getStyleClass().removeAll("userControl", "userControl1");
             groupControlPane.getStyleClass().removeAll("groupControl", "groupControl1");
             newUserButtonPane.getStyleClass().add("newUserButton");
             userControlPane.getStyleClass().add("userControl");
             groupControlPane.getStyleClass().add("groupControl1");
+            add(rightPanel, 1, 0);
         });
 
         leftPanel.setCenter(toolbarMenu);
-    }
-
-    protected void onNewUserButtonClick(BorderPane rightPanel) {
-        rightPanel.setPrefHeight(768);
-        rightPanel.setPrefWidth(880);
-        FlowPane ChoiceBox = new FlowPane();
-        ChoiceBox.setAlignment(Pos.CENTER);
-        ChoiceBox.setPadding(new Insets(50,0,0,0));
-        FlowPane ChoicePane = new FlowPane();
-        ChoicePane.setPrefSize(460,60);
-        ChoicePane.setAlignment(Pos.CENTER);
-        ChoicePane.getStyleClass().add("choicePane");
-        ChoicePane.setHgap(30);
-        RadioButton studentChoice = new RadioButton("Студент");
-        RadioButton prepodChoice = new RadioButton("Преподаватель");
-        prepodChoice.setPrefSize(200,40);
-        prepodChoice.setAlignment(Pos.CENTER);
-        prepodChoice.getStyleClass().remove("radio-button");
-        studentChoice.setPrefSize(200,40);
-        studentChoice.setAlignment(Pos.CENTER);
-        studentChoice.getStyleClass().remove("radio-button");
-        ToggleGroup choiceButtons = new ToggleGroup();
-        studentChoice.getStyleClass().add("studentChoice");
-        prepodChoice.getStyleClass().add("prepodChoice");
-        studentChoice.setToggleGroup(choiceButtons);
-        prepodChoice.setToggleGroup(choiceButtons);
-        ChoicePane.getChildren().addAll(studentChoice, prepodChoice);
-        ChoiceBox.getChildren().add(ChoicePane);
-        rightPanel.setTop(ChoiceBox);
-        add(rightPanel, 1, 0);
-
-        prepodChoice.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isNowSelected) {
-                GridPane inputForm;
-                if(isNowSelected) {
-                    // Выбор Преподаватель: Изменение стилей
-                    studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
-                    prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
-                    prepodChoice.getStyleClass().add("prepodChoice1");
-                    studentChoice.getStyleClass().add("studentChoice");
-
-                    // Форма заполнения преподавателя
-                    inputForm = new GridPane();
-                    inputForm = new GridPane();
-                    inputForm.setAlignment(Pos.CENTER);
-                    inputForm.setHgap(30);
-                    inputForm.setVgap(30);
-                    inputForm.setPadding(new Insets(25, 25, 25, 25));
-
-                    TextField firstName = new TextField();
-                    TextField lastName = new TextField();
-                    TextField thirdName = new TextField();
-                    DatePicker startingUsingAccountDate = new DatePicker();
-                    DatePicker endingUsingAccountDate = new DatePicker();
-
-                    firstName.setPromptText("Имя");
-                    lastName.setPromptText("Фамилия");
-                    thirdName.setPromptText("Отчество");
-                    startingUsingAccountDate.setValue(LocalDate.now());
-                    endingUsingAccountDate.setValue(LocalDate.now());
-
-                    ObservableList<String> department = FXCollections.observableArrayList(
-                            "Автоматика и телемеханика на железных дорогах", "Высшая математика",
-                            "Информационные и вычислительные системы", "Информатика и информационная безопасность",
-                            "Электротехника и теплоэнергетика", "Электрическая связь", "Электроснабжение железных дорог",
-                            "Архитектурно-строительное проектирование", "Водоснабжение, водоотведение и гидравлика",
-                            "Инженерная химия и естествознание", "Основания и фундаменты");
-                    ComboBox<String> departmentBox = new ComboBox<String>(department);
-
-                    ObservableList<String> position = FXCollections.observableArrayList(
-                            "Профессор", "Старший преподаватель", "Доцент", "Ассистент", "Заведующий кафедрой",
-                            "Декан", "Проректор", "Ректор");
-                    ComboBox<String> positionBox = new ComboBox<String>(position);
-
-                    ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
-                    ComboBox<String> degreeBox = new ComboBox<String>(degree);
-
-                    inputForm.add(lastName, 1, 1);
-                    inputForm.add(firstName, 1, 2);
-                    inputForm.add(thirdName, 1, 3);
-                    inputForm.add(startingUsingAccountDate, 1, 4);
-                    inputForm.add(endingUsingAccountDate, 1, 5);
-                    inputForm.add(departmentBox, 1, 6);
-                    inputForm.add(positionBox, 1, 7);
-                    inputForm.add(degreeBox, 1, 8);
-
-                    rightPanel.setCenter(inputForm);
-
-                    Button sendButton = new Button("Создать");
-                    FlowPane sendPane = new FlowPane(sendButton);
-                    sendPane.setAlignment(Pos.CENTER);
-                    sendPane.setPadding(new Insets(0, 0, 50, 0));
-                    rightPanel.setBottom(sendPane);
-
-                    sendButton.setOnAction(e -> {
-                        // Событие для кнопки создать
-                    });
-                }
-            }
-        });
-
-        studentChoice.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isNowSelected) {
-                GridPane inputForm;
-                if(isNowSelected) {
-                    // Выбор студент: Изменение стилей
-                    studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
-                    prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
-                    studentChoice.getStyleClass().add("studentChoice1");
-                    prepodChoice.getStyleClass().add("prepodChoice");
-
-                    // Форма заполнения студента
-                    inputForm = new GridPane();
-                    inputForm.setAlignment(Pos.CENTER);
-                    inputForm.setHgap(30);
-                    inputForm.setVgap(30);
-                    inputForm.setPadding(new Insets(25, 25, 25, 25));
-
-                    TextField firstName = new TextField();
-                    TextField lastName = new TextField();
-                    TextField patronymic = new TextField();
-
-                    // Получение списка имён групп
-                    List<String> groups =  httpUtil.getGroupNames();
-                    ObservableList<String> groupOL = FXCollections.observableArrayList(groups);
-                    ComboBox<String> groupSelect = new ComboBox<>(groupOL);
-
-                    DatePicker startingUsingAccountDate = new DatePicker();
-                    DatePicker endingUsingAccountDate = new DatePicker();
-
-                    firstName.setPromptText("Имя");
-                    lastName.setPromptText("Фамилия");
-                    patronymic.setPromptText("Отчество");
-                    startingUsingAccountDate.setValue(LocalDate.now());
-                    endingUsingAccountDate.setValue(LocalDate.now());
-
-                    ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
-                    ComboBox<String> compensationBox = new ComboBox<String>(compensation);
-                    
-                    Text errorInfo = new Text();
-                    errorInfo.setFill(Color.RED);
-
-                    inputForm.add(lastName, 0, 0);
-                    inputForm.add(firstName, 0, 1);
-                    inputForm.add(patronymic, 0, 2);
-                    inputForm.add(groupSelect, 0, 3);
-                    inputForm.add(startingUsingAccountDate, 0, 4);
-                    inputForm.add(endingUsingAccountDate, 0, 5);
-                    inputForm.add(compensationBox, 0, 6);
-                    inputForm.add(errorInfo, 0, 7);
-
-                    rightPanel.setCenter(inputForm);
-
-                    Button sendButton = new Button("Создать");
-                    
-                    FlowPane sendPane = new FlowPane(sendButton);
-                    sendPane.setAlignment(Pos.CENTER);
-                    sendPane.setPadding(new Insets(0, 0, 50, 0));
-                    rightPanel.setBottom(sendPane);
-
-                    sendButton.setOnAction(e -> {
-                    	List<String> unfilledFields = new ArrayList<>();
-                        if(lastName.getText().isBlank()) {
-                        	unfilledFields.add("Фамилия");
-                        }
-                        if(firstName.getText().isBlank()) {
-                        	unfilledFields.add("Имя");
-                        }
-                        if(groupSelect.getValue() == null) {
-                        	unfilledFields.add("Группа");
-                        }
-
-                        if(!unfilledFields.isEmpty()) {
-                            errorInfo.setText("Необходимо заполнить поле " + unfilledFields.getFirst());
-                            return;
-                        }
-
-                        User newUser = new User();
-                        newUser.setFirstName(firstName.getText());
-                        newUser.setLastName(lastName.getText());
-                        newUser.setPatronymic(patronymic.getText());
-                        newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
-                        newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
-                        newUser.setRole("student");
-                        newUser.setGroupName(groupSelect.getValue());
-                        newUser.setReimbursement(compensationBox.getValue());
-
-                        System.out.println(httpUtil.saveNewUser(newUser));
-                    });
-
-                }
-            }
-        });
     }
      
     protected void onUserControlButtonClick(BorderPane rightPanel) {

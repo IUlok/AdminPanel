@@ -11,7 +11,7 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        GridPane client = new Client();
+        Client client = new Client();
         Scene scene = new Scene(client, 1280, 768);
         scene.getStylesheets().add((HelloApplication.class.getResource("assets/style.css")).toString());
         stage.setTitle("Nefesle Admin");

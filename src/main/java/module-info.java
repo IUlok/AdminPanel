@@ -7,5 +7,5 @@ module AdminPanel {
     requires java.sql;
 
     exports com.example.adminpanel to javafx.graphics;
-    opens com.example.adminpanel.entity to com.google.gson;
+    opens com.example.adminpanel.entity to com.google.gson, javafx.base;
 }

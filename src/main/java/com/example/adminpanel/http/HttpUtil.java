@@ -36,7 +36,6 @@ public class HttpUtil {
 	
 	public List<String> getGroupNames() {
 		try {
-			
 			HttpRequest request = HttpRequest.newBuilder()
 					.uri(new URI(serverUri + "/group/"))
 					.GET().build();
@@ -58,9 +57,8 @@ public class HttpUtil {
 
 	public boolean saveNewUser(User user) {
 		try {
-
 			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-mm-dd").create();
+					.setDateFormat("yyyy-MM-dd").create();
 			String userJson = gson.toJson(user);
 
 			HttpRequest request = HttpRequest.newBuilder()
@@ -71,6 +69,25 @@ public class HttpUtil {
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 			return response.statusCode() == 200;
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<Group> getGroups(int count) {
+		try {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/group/get?count=" + count))
+					.GET().build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			if(response.statusCode() != 200) {
+				return null;
+			}
+
+			List<Group> groups = new Gson().fromJson(response.body(), new TypeToken<ArrayList<Group>>(){}.getType());
+			System.out.println(groups);
+			return groups;
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
