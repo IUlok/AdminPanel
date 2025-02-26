@@ -120,37 +120,37 @@ public class Client extends GridPane {
 
         newUserButtonPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
-            rightPanel = new NewUserPane();
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
             userControlPane.getStyleClass().removeAll("userControl", "userControl1");
             groupControlPane.getStyleClass().removeAll("groupControl", "groupControl1");
             newUserButtonPane.getStyleClass().add("newUserButton1");
             userControlPane.getStyleClass().add("userControl");
             groupControlPane.getStyleClass().add("groupControl");
+            rightPanel = new NewUserPane();
             add(rightPanel, 1, 0);
         });
 
         userControlPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
-            rightPanel = new NewUserPane();
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
             userControlPane.getStyleClass().removeAll("userControl", "userControl1");
             groupControlPane.getStyleClass().removeAll("groupControl", "groupControl1");
             newUserButtonPane.getStyleClass().add("newUserButton");
             userControlPane.getStyleClass().add("userControl1");
             groupControlPane.getStyleClass().add("groupControl");
+            rightPanel = new NewUserPane();
             add(rightPanel, 1, 0);
         });
 
         groupControlPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
-            rightPanel = new GroupsPane();
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
             userControlPane.getStyleClass().removeAll("userControl", "userControl1");
             groupControlPane.getStyleClass().removeAll("groupControl", "groupControl1");
             newUserButtonPane.getStyleClass().add("newUserButton");
             userControlPane.getStyleClass().add("userControl");
             groupControlPane.getStyleClass().add("groupControl1");
+            rightPanel = new GroupsPane();
             add(rightPanel, 1, 0);
         });
 

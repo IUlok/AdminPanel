@@ -77,6 +77,7 @@ public class NewUserPane extends BorderPane {
         inputForm.setHgap(30);
         inputForm.setVgap(30);
         inputForm.setPadding(new Insets(25, 25, 25, 25));
+        inputForm.setVisible(false);
 
         firstName.setPromptText("Имя");
         lastName.setPromptText("Фамилия");
@@ -104,6 +105,7 @@ public class NewUserPane extends BorderPane {
 
                 if(isNowSelected) {
                     // Выбор Преподаватель: Изменение стилей
+                    inputForm.setVisible(true);
                     studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
                     prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
                     prepodChoice.getStyleClass().add("prepodChoice1");
@@ -159,6 +161,7 @@ public class NewUserPane extends BorderPane {
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isNowSelected) {
                 if(isNowSelected) {
                     // Выбор студент: Изменение стилей
+                    inputForm.setVisible(true);
                     studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
                     prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
                     studentChoice.getStyleClass().add("studentChoice1");

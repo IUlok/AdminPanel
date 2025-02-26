@@ -6,37 +6,106 @@ import com.example.adminpanel.http.HttpUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Flow;
 
-public class GroupsPane extends VBox {
+public class GroupsPane extends BorderPane {
 
     private final HttpUtil httpUtil = new HttpUtil();
 
-    private final TextField groupName = new TextField("Название группы");
+    private final TextField groupName = new TextField();
     private ComboBox<String> faculty;
     private ComboBox<String> programType;
     private final TextField program = new TextField("Направление подготовки");
+    private final TextField searchInput = new TextField();
     private ComboBox<String> studyForm;
     private TableView<Group> table;
+
+    private GridPane formPane = new GridPane();
 
     private Group selectedGroup;
 
     public GroupsPane() {
+        setPrefHeight(768);
+        setPrefWidth(880);
 
-        List<Group> groupList = httpUtil.getGroups(20);
+        //List<Group> groupList = httpUtil.getGroups(20);
+        List<Group> groupList = new ArrayList<>();
+
+        FlowPane panelOnTop = new FlowPane();
+        panelOnTop.setAlignment(Pos.CENTER);
+        panelOnTop.setHgap(50);
+        panelOnTop.setPadding(new Insets(50,0,30,0));
+
+        GridPane searchGrand = new GridPane(2, 1);
+        FlowPane searchPanel = new FlowPane();
+        searchPanel.setPrefWidth(600);
+        searchPanel.setAlignment(Pos.CENTER);
+        searchPanel.setHgap(20);
+        searchPanel.setVgap(20);
+        searchPanel.getStyleClass().add("searchPanel");
+        searchInput.setPrefSize(500,50);
+        searchInput.getStyleClass().add("searchInput");
+        searchPanel.getChildren().add(searchInput);
+
+        Label searchButton = new Label();
+        searchButton.getStyleClass().add("searchButton");
+        searchButton.setPrefSize(50,50);
+        searchPanel.getChildren().add(searchButton);
+
+        RadioButton nameChoice = new RadioButton("по названию");
+        RadioButton cursChoice = new RadioButton("по курсу");
+        RadioButton facultyChoice = new RadioButton("по факультету");
+        RadioButton typeChoice = new RadioButton("по форме обучения");
+
+        FlowPane filterPane = new FlowPane();
+        filterPane.setPadding(new Insets(20,0,0,0));
+        filterPane.setAlignment(Pos.CENTER);
+        filterPane.setHgap(50);
+        ToggleGroup filterButtons = new ToggleGroup();
+        nameChoice.setToggleGroup(filterButtons);
+        cursChoice.setToggleGroup(filterButtons);
+        facultyChoice.setToggleGroup(filterButtons);
+        typeChoice.setToggleGroup(filterButtons);
+        nameChoice.setSelected(true);
+        filterPane.getChildren().addAll(nameChoice, cursChoice, facultyChoice, typeChoice);
+
+        searchGrand.add(searchPanel, 0, 1);
+        searchGrand.add(filterPane, 0,2);
+
+        panelOnTop.getChildren().add(searchGrand);
+
+        Button createGroupButton = new Button("Создать новую группу");
+        createGroupButton.getStyleClass().add("creteGroupButton");
+        createGroupButton.setPrefSize(150,50);
+        createGroupButton.setOnAction(e -> {
+            selectedGroup = null;
+            groupName.setText("");
+            faculty.setValue("");
+            programType.setValue("");
+            program.setText("");
+            studyForm.setValue("");
+
+            formPane.setVisible(true);
+        });
+        panelOnTop.getChildren().add(createGroupButton);
+        setTop(panelOnTop);
 
         StackPane stackPane = new StackPane();
 
         ObservableList<Group> groups = FXCollections.observableArrayList(groupList);
         table = new TableView<>(groups);
-        table.setPrefWidth(400);
-        table.setPrefHeight(500);
+        table.setPrefWidth(880);
+        table.setPrefHeight(400);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         TableColumn<Group, String> nameColumn = new TableColumn<>("Группа");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -55,7 +124,6 @@ public class GroupsPane extends VBox {
         table.getColumns().add(programColumn);
 
         stackPane.getChildren().add(table);
-        GridPane formPane = new GridPane();
         formPane.setMaxSize(300, 400);
 
         ObservableList<String> facultyList = FXCollections.observableArrayList("Автоматизация и интеллектуальные технологии",
@@ -84,7 +152,8 @@ public class GroupsPane extends VBox {
         Button saveButton = new Button("Сохранить группу");
         saveButton.setOnAction(e -> {
             Group group = new Group();
-            group.setId(selectedGroup.getId());
+            if(selectedGroup != null)
+                group.setId(selectedGroup.getId());
             group.setName(groupName.getText());
             group.setFaculty(faculty.getValue());
             group.setProgramType(programType.getValue());
@@ -96,7 +165,14 @@ public class GroupsPane extends VBox {
             reloadGroups();
         });
 
+        Button closeButton = new Button("Закрыть");
+        closeButton.setOnAction(e1 -> {
+            formPane.setVisible(false);
+            reloadGroups();
+        });
+
         formPane.add(saveButton, 0, 5);
+        formPane.add(closeButton, 0, 6);
         formPane.setVisible(false);
         stackPane.getChildren().add(formPane);
 
@@ -119,11 +195,13 @@ public class GroupsPane extends VBox {
         });
 
 
-        getChildren().add(stackPane);
+        //getChildren().add(stackPane);
+        setCenter(stackPane);
     }
 
     private void reloadGroups() {
-        List<Group> newGroupList = httpUtil.getGroups(20);
+        //List<Group> newGroupList = httpUtil.getGroups(20);
+        List<Group> newGroupList = new ArrayList<>();
         table.getItems().clear();
         table.getItems().addAll(newGroupList);
     }
