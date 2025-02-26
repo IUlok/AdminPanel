@@ -18,18 +18,33 @@ public class GroupsPane extends VBox {
 
     private final HttpUtil httpUtil = new HttpUtil();
 
-    private final TextField groupName = new TextField("Название группы");
+    private final TextField groupName = new TextField();
     private ComboBox<String> faculty;
     private ComboBox<String> programType;
     private final TextField program = new TextField("Направление подготовки");
     private ComboBox<String> studyForm;
     private TableView<Group> table;
 
+    private GridPane formPane = new GridPane();
+
     private Group selectedGroup;
 
     public GroupsPane() {
 
         List<Group> groupList = httpUtil.getGroups(20);
+
+        Button createGroupButton = new Button("Создать новую группу");
+        createGroupButton.setOnAction(e -> {
+            selectedGroup = null;
+            groupName.setText("");
+            faculty.setValue("");
+            programType.setValue("");
+            program.setText("");
+            studyForm.setValue("");
+
+            formPane.setVisible(true);
+        });
+        getChildren().add(createGroupButton);
 
         StackPane stackPane = new StackPane();
 
@@ -55,7 +70,6 @@ public class GroupsPane extends VBox {
         table.getColumns().add(programColumn);
 
         stackPane.getChildren().add(table);
-        GridPane formPane = new GridPane();
         formPane.setMaxSize(300, 400);
 
         ObservableList<String> facultyList = FXCollections.observableArrayList("Автоматизация и интеллектуальные технологии",
@@ -84,7 +98,8 @@ public class GroupsPane extends VBox {
         Button saveButton = new Button("Сохранить группу");
         saveButton.setOnAction(e -> {
             Group group = new Group();
-            group.setId(selectedGroup.getId());
+            if(selectedGroup != null)
+                group.setId(selectedGroup.getId());
             group.setName(groupName.getText());
             group.setFaculty(faculty.getValue());
             group.setProgramType(programType.getValue());
