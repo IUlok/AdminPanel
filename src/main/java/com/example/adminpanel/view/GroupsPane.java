@@ -29,6 +29,8 @@ public class GroupsPane extends BorderPane {
     private ComboBox<String> studyForm;
     private TableView<Group> table;
 
+    private String selectedFindParam = "name";
+
     private GridPane formPane = new GridPane();
 
     private Group selectedGroup;
@@ -60,11 +62,38 @@ public class GroupsPane extends BorderPane {
         searchButton.getStyleClass().add("searchButton");
         searchButton.setPrefSize(50,50);
         searchPanel.getChildren().add(searchButton);
+        searchButton.setOnMouseClicked((e) -> {
+            getGroupsWithParamValue();
+        });
 
         RadioButton nameChoice = new RadioButton("по названию");
         RadioButton cursChoice = new RadioButton("по курсу");
         RadioButton facultyChoice = new RadioButton("по факультету");
         RadioButton typeChoice = new RadioButton("по форме обучения");
+
+        nameChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "name";
+            }
+        });
+
+        cursChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "course";
+            }
+        });
+
+        facultyChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "faculty";
+            }
+        });
+
+        typeChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "studyForm";
+            }
+        });
 
         FlowPane filterPane = new FlowPane();
         filterPane.setPadding(new Insets(20,0,0,0));
@@ -200,9 +229,22 @@ public class GroupsPane extends BorderPane {
     }
 
     private void reloadGroups() {
-        List<Group> newGroupList = httpUtil.getGroups(20);
-        //List<Group> newGroupList = new ArrayList<>();
+        if(searchInput.getText().isBlank()) {
+            List<Group> newGroupList = httpUtil.getGroups(20);
+            table.getItems().clear();
+            table.getItems().addAll(newGroupList);
+        } else {
+            getGroupsWithParamValue();
+        }
+    }
+
+    private void getGroupsWithParamValue() {
+        if(searchInput.getText().isBlank()) {
+            return;
+        }
+
+        List<Group> groups = httpUtil.findGroupByParam(selectedFindParam, searchInput.getText());
         table.getItems().clear();
-        table.getItems().addAll(newGroupList);
+        table.getItems().addAll(groups);
     }
 }
