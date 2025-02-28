@@ -94,6 +94,25 @@ public class HttpUtil {
 		}
 	}
 
+	public List<Group> findGroupByParam(String paramName, String paramValue) {
+		try {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/group/find?" + paramName + "=" + paramValue))
+					.GET().build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			if(response.statusCode() != 200) {
+				return null;
+			}
+
+			List<Group> groups = new Gson().fromJson(response.body(), new TypeToken<ArrayList<Group>>(){}.getType());
+			System.out.println(groups);
+			return groups;
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public boolean saveGroup(Group group) {
 		try {
 			String groupJson = new Gson().toJson(group);

@@ -29,6 +29,8 @@ public class GroupsPane extends BorderPane {
     private ComboBox<String> studyForm;
     private TableView<Group> table;
 
+    private String selectedFindParam = "name";
+
     private GridPane formPane = new GridPane();
 
     private Group selectedGroup;
@@ -60,11 +62,38 @@ public class GroupsPane extends BorderPane {
         searchButton.getStyleClass().add("searchButton");
         searchButton.setPrefSize(50,50);
         searchPanel.getChildren().add(searchButton);
+        searchButton.setOnMouseClicked((e) -> {
+            getGroupsWithParamValue();
+        });
 
         RadioButton nameChoice = new RadioButton("по названию");
         RadioButton cursChoice = new RadioButton("по курсу");
         RadioButton facultyChoice = new RadioButton("по факультету");
         RadioButton typeChoice = new RadioButton("по форме обучения");
+
+        nameChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "name";
+            }
+        });
+
+        cursChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "course";
+            }
+        });
+
+        facultyChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "faculty";
+            }
+        });
+
+        typeChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                selectedFindParam = "studyForm";
+            }
+        });
 
         FlowPane filterPane = new FlowPane();
         filterPane.setPadding(new Insets(20,0,0,0));
@@ -109,23 +138,66 @@ public class GroupsPane extends BorderPane {
 
         TableColumn<Group, String> nameColumn = new TableColumn<>("Группа");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
         table.getColumns().add(nameColumn);
 
         TableColumn<Group, String> facultyColumn = new TableColumn<>("Факультет");
         facultyColumn.setCellValueFactory(new PropertyValueFactory<>("faculty"));
+        facultyColumn.prefWidthProperty().bind(table.widthProperty().multiply(1));
         table.getColumns().add(facultyColumn);
 
         TableColumn<Group, String> programTypeColumn = new TableColumn<>("Тип направления");
         programTypeColumn.setCellValueFactory(new PropertyValueFactory<>("programType"));
+        programTypeColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.7));
         table.getColumns().add(programTypeColumn);
 
         TableColumn<Group, String> programColumn = new TableColumn<>("Направление подготовки");
         programColumn.setCellValueFactory(new PropertyValueFactory<>("program"));
+        programColumn.prefWidthProperty().bind(table.widthProperty().multiply(3));
         table.getColumns().add(programColumn);
 
-        stackPane.getChildren().add(table);
-        formPane.setMaxSize(300, 400);
+        TableColumn<Group, Group> settings = new TableColumn<>();
+        settings.setCellFactory(col -> {
+            Label settingsButton = new Label();
+            settingsButton.setPrefSize(20,21);
+            settingsButton.getStyleClass().add("settingsButton");
 
+            Label deleteButton = new Label();
+            deleteButton.setPrefSize(20,21);
+            deleteButton.getStyleClass().add("deleteButton");
+
+            FlowPane buttonsSettings = new FlowPane(settingsButton, deleteButton);
+            buttonsSettings.setHgap(3);
+            buttonsSettings.setAlignment(Pos.CENTER);
+
+            TableCell<Group, Group> addCell = new TableCell<Group, Group>() {
+                public void updateItem(Group group, boolean empty) {
+                    super.updateItem(group, empty);
+                    if(empty) {
+                        setGraphic(null);
+                    }
+                    else {
+                        setGraphic(buttonsSettings);
+                    }
+                }
+            };
+            settingsButton.setOnMouseClicked(event -> {
+                // Здесь нужно сделать чтобы выскакивала панель с обновлением этой строки
+            });
+
+            deleteButton.setOnMouseClicked(event -> {
+                // Здесь нужно сделать чтобы было удаление этой группы
+            });
+            return addCell;
+        });
+        settings.prefWidthProperty().bind(table.widthProperty().multiply(0.4));
+        table.getColumns().add(settings);
+
+        stackPane.getChildren().add(table);
+        formPane.setMaxSize(400, 300);
+        formPane.getStyleClass().add("formGroupPane");
+        formPane.setAlignment(Pos.CENTER);
+        formPane.setVgap(10);
         ObservableList<String> facultyList = FXCollections.observableArrayList("Автоматизация и интеллектуальные технологии",
                 "Транспортное строительство", "Управление перевозками и логистика", "Факультет безотрывных форм обучения",
                 "Промышленное и гражданское строительство", "Транспортные и энергетические системы", "Экономика и менеджмент");
@@ -138,15 +210,15 @@ public class GroupsPane extends BorderPane {
         studyForm = new ComboBox<>(studyFormList);
 
         formPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-        formPane.add(new Text("Название группы"), 0, 0);
+        formPane.add(new Text("Название группы: "), 0, 0);
         formPane.add(groupName, 1, 0);
-        formPane.add(new Text("Факультет"), 0, 1);
+        formPane.add(new Text("Факультет: "), 0, 1);
         formPane.add(faculty, 1, 1);
-        formPane.add(new Text("Тип направления"), 0, 2);
+        formPane.add(new Text("Тип направления: "), 0, 2);
         formPane.add(programType, 1, 2);
-        formPane.add(new Text("Направление"), 0, 3);
+        formPane.add(new Text("Направление: "), 0, 3);
         formPane.add(program, 1, 3);
-        formPane.add(new Text("Форма обучения"), 0, 4);
+        formPane.add(new Text("Форма обучения: "), 0, 4);
         formPane.add(studyForm, 1, 4);
 
         Button saveButton = new Button("Сохранить группу");
@@ -170,9 +242,11 @@ public class GroupsPane extends BorderPane {
             formPane.setVisible(false);
             reloadGroups();
         });
+        saveButton.setPrefWidth(120);
+        FlowPane panelButtons = new FlowPane(saveButton, closeButton);
+        panelButtons.setHgap(20);
 
-        formPane.add(saveButton, 0, 5);
-        formPane.add(closeButton, 0, 6);
+        formPane.add(panelButtons, 1,5);
         formPane.setVisible(false);
         stackPane.getChildren().add(formPane);
 
@@ -194,15 +268,26 @@ public class GroupsPane extends BorderPane {
             return row;
         });
 
-
-        //getChildren().add(stackPane);
         setCenter(stackPane);
     }
 
     private void reloadGroups() {
-        List<Group> newGroupList = httpUtil.getGroups(20);
-        //List<Group> newGroupList = new ArrayList<>();
+        if(searchInput.getText().isBlank()) {
+            List<Group> newGroupList = httpUtil.getGroups(20);
+            table.getItems().clear();
+            table.getItems().addAll(newGroupList);
+        } else {
+            getGroupsWithParamValue();
+        }
+    }
+
+    private void getGroupsWithParamValue() {
+        if(searchInput.getText().isBlank()) {
+            return;
+        }
+
+        List<Group> groups = httpUtil.findGroupByParam(selectedFindParam, searchInput.getText());
         table.getItems().clear();
-        table.getItems().addAll(newGroupList);
+        table.getItems().addAll(groups);
     }
 }

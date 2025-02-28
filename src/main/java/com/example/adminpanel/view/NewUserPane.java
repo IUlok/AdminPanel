@@ -99,60 +99,57 @@ public class NewUserPane extends BorderPane {
         // Добавление формы на панель
         setCenter(inputForm);
 
-        prepodChoice.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isNowSelected) {
+        prepodChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
 
-                if(isNowSelected) {
-                    // Выбор Преподаватель: Изменение стилей
-                    inputForm.setVisible(true);
-                    studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
-                    prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
-                    prepodChoice.getStyleClass().add("prepodChoice1");
-                    studentChoice.getStyleClass().add("studentChoice");
+            if(isNowSelected) {
+                // Выбор Преподаватель: Изменение стилей
+                inputForm.setVisible(true);
+                studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
+                prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
+                prepodChoice.getStyleClass().add("prepodChoice1");
+                studentChoice.getStyleClass().add("studentChoice");
 
-                    ObservableList<String> department = FXCollections.observableArrayList(
-                            "Автоматика и телемеханика на железных дорогах", "Высшая математика",
-                            "Информационные и вычислительные системы", "Информатика и информационная безопасность",
-                            "Электротехника и теплоэнергетика", "Электрическая связь", "Электроснабжение железных дорог",
-                            "Архитектурно-строительное проектирование", "Водоснабжение, водоотведение и гидравлика",
-                            "Инженерная химия и естествознание", "Основания и фундаменты");
-                    departmentBox = new ComboBox<>(department);
+                ObservableList<String> department = FXCollections.observableArrayList(
+                        "Автоматика и телемеханика на железных дорогах", "Высшая математика",
+                        "Информационные и вычислительные системы", "Информатика и информационная безопасность",
+                        "Электротехника и теплоэнергетика", "Электрическая связь", "Электроснабжение железных дорог",
+                        "Архитектурно-строительное проектирование", "Водоснабжение, водоотведение и гидравлика",
+                        "Инженерная химия и естествознание", "Основания и фундаменты");
+                departmentBox = new ComboBox<>(department);
 
-                    ObservableList<String> position = FXCollections.observableArrayList(
-                            "Профессор", "Старший преподаватель", "Доцент", "Ассистент", "Заведующий кафедрой",
-                            "Декан", "Проректор", "Ректор");
-                    positionBox = new ComboBox<>(position);
+                ObservableList<String> position = FXCollections.observableArrayList(
+                        "Профессор", "Старший преподаватель", "Доцент", "Ассистент", "Заведующий кафедрой",
+                        "Декан", "Проректор", "Ректор");
+                positionBox = new ComboBox<>(position);
 
-                    ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
-                    degreeBox = new ComboBox<>(degree);
+                ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
+                degreeBox = new ComboBox<>(degree);
 
-                    inputForm.getChildren().removeAll(compensationBox, groupSelect);
-                    inputForm.add(departmentBox, 0, 5);
-                    inputForm.add(positionBox, 0, 6);
-                    inputForm.add(degreeBox, 0, 7);
+                inputForm.getChildren().removeAll(compensationBox, groupSelect);
+                inputForm.add(departmentBox, 0, 5);
+                inputForm.add(positionBox, 0, 6);
+                inputForm.add(degreeBox, 0, 7);
 
-                    Button sendButton = new Button("Создать");
-                    FlowPane sendPane = new FlowPane(sendButton);
-                    sendPane.setAlignment(Pos.CENTER);
-                    sendPane.setPadding(new Insets(0, 0, 50, 0));
-                    setBottom(sendPane);
+                Button sendButton = new Button("Создать");
+                FlowPane sendPane = new FlowPane(sendButton);
+                sendPane.setAlignment(Pos.CENTER);
+                sendPane.setPadding(new Insets(0, 0, 50, 0));
+                setBottom(sendPane);
 
-                    sendButton.setOnAction(e -> {
-                        User newUser = new User();
-                        newUser.setFirstName(firstName.getText());
-                        newUser.setLastName(lastName.getText());
-                        newUser.setPatronymic(patronymic.getText());
-                        newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
-                        newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
-                        newUser.setRole("professor");
-                        newUser.setDepartment(departmentBox.getValue());
-                        newUser.setAcademicTitle(positionBox.getValue());
-                        newUser.setAcademicDegree(degreeBox.getValue());
+                sendButton.setOnAction(e -> {
+                    User newUser = new User();
+                    newUser.setFirstName(firstName.getText());
+                    newUser.setLastName(lastName.getText());
+                    newUser.setPatronymic(patronymic.getText());
+                    newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
+                    newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
+                    newUser.setRole("professor");
+                    newUser.setDepartment(departmentBox.getValue());
+                    newUser.setAcademicTitle(positionBox.getValue());
+                    newUser.setAcademicDegree(degreeBox.getValue());
 
-                        System.out.println(httpUtil.saveNewUser(newUser));
-                    });
-                }
+                    System.out.println(httpUtil.saveNewUser(newUser));
+                });
             }
         });
 

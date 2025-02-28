@@ -181,3 +181,30 @@
     -fx-border-radius: 100;
     -fx-background-radius: 300;
 }
+
+.formGroupPane {
+    -fx-background-color: #c4c4c4;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10px;
+    -fx-border-color: #efefef;
+    -fx-border-insets: 30px;
+    -fx-background-insets: 5px;
+    -fx-border-width: 5px;
+}
+
+.settingsButton {
+    -fx-background-image: url("icons/settingsButton.png");
+}
+
+.settingsButton:hover {
+    -fx-background-color: #c4c4c4;
+}
+
+.deleteButton {
+    -fx-background-image: url("icons/deleteButton.png");
+}
+
+.deleteButton:hover {
+    -fx-background-color: #c4c4c4;
+}
