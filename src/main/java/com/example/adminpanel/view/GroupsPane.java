@@ -99,6 +99,19 @@ public class GroupsPane extends BorderPane {
         panelOnTop.getChildren().add(createGroupButton);
         setTop(panelOnTop);
 
+        Button createGroupButton = new Button("Создать новую группу");
+        createGroupButton.setOnAction(e -> {
+            selectedGroup = null;
+            groupName.setText("");
+            faculty.setValue("");
+            programType.setValue("");
+            program.setText("");
+            studyForm.setValue("");
+
+            formPane.setVisible(true);
+        });
+        getChildren().add(createGroupButton);
+
         StackPane stackPane = new StackPane();
 
         ObservableList<Group> groups = FXCollections.observableArrayList(groupList);
