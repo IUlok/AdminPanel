@@ -37,8 +37,8 @@ public class GroupsPane extends BorderPane {
         setPrefHeight(768);
         setPrefWidth(880);
 
-        //List<Group> groupList = httpUtil.getGroups(20);
-        List<Group> groupList = new ArrayList<>();
+        List<Group> groupList = httpUtil.getGroups(20);
+        //List<Group> groupList = new ArrayList<>();
 
         FlowPane panelOnTop = new FlowPane();
         panelOnTop.setAlignment(Pos.CENTER);
@@ -200,8 +200,8 @@ public class GroupsPane extends BorderPane {
     }
 
     private void reloadGroups() {
-        //List<Group> newGroupList = httpUtil.getGroups(20);
-        List<Group> newGroupList = new ArrayList<>();
+        List<Group> newGroupList = httpUtil.getGroups(20);
+        //List<Group> newGroupList = new ArrayList<>();
         table.getItems().clear();
         table.getItems().addAll(newGroupList);
     }
