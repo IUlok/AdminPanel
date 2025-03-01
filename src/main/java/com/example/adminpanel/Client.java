@@ -1,34 +1,18 @@
 package com.example.adminpanel;
 
-import com.example.adminpanel.entity.User;
 import com.example.adminpanel.view.GroupsPane;
 import com.example.adminpanel.view.NewUserPane;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
-import com.example.adminpanel.http.HttpUtil;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Client extends GridPane {
     private Pane rightPanel = new BorderPane();
-    private BorderPane leftPanel = new BorderPane();
-    Stage dialogStage = new Stage();
-    
+
     public Client() {
-        // Конфигурация панели меню
+        // Создание и конфигурация панели меню
+        BorderPane leftPanel = new BorderPane();
         leftPanel.setPrefHeight(768);
         leftPanel.setPrefWidth(400);
         leftPanel.setStyle("-fx-background-color: #7a7a7a;");
@@ -118,6 +102,7 @@ public class Client extends GridPane {
         toolbarMenu.setAlignment(Pos.CENTER);
         toolbarMenu.getChildren().addAll(newUserButtonPane, userControlPane, groupControlPane);
 
+        // Обработка нажатия на кнопку меню "Новый пользователь"
         newUserButtonPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
@@ -126,10 +111,12 @@ public class Client extends GridPane {
             newUserButtonPane.getStyleClass().add("newUserButton1");
             userControlPane.getStyleClass().add("userControl");
             groupControlPane.getStyleClass().add("groupControl");
+            // В правую панель устанавливается панель для создания пользователя
             rightPanel = new NewUserPane();
             add(rightPanel, 1, 0);
         });
 
+        // Обработка нажатия на кнопку меню "Пользователи"
         userControlPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
@@ -138,10 +125,12 @@ public class Client extends GridPane {
             newUserButtonPane.getStyleClass().add("newUserButton");
             userControlPane.getStyleClass().add("userControl1");
             groupControlPane.getStyleClass().add("groupControl");
+            // В правую панель устанавливается панель для работы с пользователями
             rightPanel = new NewUserPane();
             add(rightPanel, 1, 0);
         });
 
+        // Обработка нажатия на кнопку меню "Группы"
         groupControlPane.setOnMouseClicked(e -> {
             getChildren().remove(rightPanel);
             newUserButtonPane.getStyleClass().removeAll("newUserButton", "newUserButton1");
@@ -150,26 +139,11 @@ public class Client extends GridPane {
             newUserButtonPane.getStyleClass().add("newUserButton");
             userControlPane.getStyleClass().add("userControl");
             groupControlPane.getStyleClass().add("groupControl1");
+            // В правую панель устанавливается панель для работы с группами
             rightPanel = new GroupsPane();
             add(rightPanel, 1, 0);
         });
 
         leftPanel.setCenter(toolbarMenu);
-    }
-     
-    protected void onUserControlButtonClick(BorderPane rightPanel) {
-        rightPanel.setPrefHeight(768);
-        rightPanel.setPrefWidth(880);
-        Button gavno = new Button("hello2");
-        rightPanel.setCenter(gavno);
-        add(rightPanel, 1, 0);
-    }
-
-    protected void onGroupControlButtonClick(BorderPane rightPanel) {
-        rightPanel.setPrefHeight(768);
-        rightPanel.setPrefWidth(880);
-        Button gavno = new Button("hello3");
-        rightPanel.setCenter(gavno);
-        add(rightPanel, 1, 0);
     }
 }

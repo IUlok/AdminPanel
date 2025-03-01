@@ -13,8 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Flow;
 
 public class GroupsPane extends BorderPane {
@@ -27,20 +26,20 @@ public class GroupsPane extends BorderPane {
     private final TextField program = new TextField("Направление подготовки");
     private final TextField searchInput = new TextField();
     private ComboBox<String> studyForm;
-    private TableView<Group> table;
+    private final TableView<Group> table;
 
+    // В этой переменной хранится имя свойства, по которому производится поиск
     private String selectedFindParam = "name";
 
-    private GridPane formPane = new GridPane();
+    private final GridPane formPane = new GridPane();
 
+    // Группа, с которой ведётся работа
     private Group selectedGroup;
 
     public GroupsPane() {
-        setPrefHeight(768);
-        setPrefWidth(880);
+        setPrefSize(880, 768);
 
         List<Group> groupList = httpUtil.getGroups(20);
-        //List<Group> groupList = new ArrayList<>();
 
         FlowPane panelOnTop = new FlowPane();
         panelOnTop.setAlignment(Pos.CENTER);
@@ -128,12 +127,13 @@ public class GroupsPane extends BorderPane {
         panelOnTop.getChildren().add(createGroupButton);
         setTop(panelOnTop);
 
+        // Основной интерфейс помещается в StackPane, чтобы была возможность размещения окна с формой
+        // редактирования группы поверх всех элементов
         StackPane stackPane = new StackPane();
 
         ObservableList<Group> groups = FXCollections.observableArrayList(groupList);
         table = new TableView<>(groups);
-        table.setPrefWidth(880);
-        table.setPrefHeight(400);
+        table.setPrefSize(880, 460);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         TableColumn<Group, String> nameColumn = new TableColumn<>("Группа");
@@ -170,23 +170,39 @@ public class GroupsPane extends BorderPane {
             buttonsSettings.setHgap(3);
             buttonsSettings.setAlignment(Pos.CENTER);
 
-            TableCell<Group, Group> addCell = new TableCell<Group, Group>() {
+            TableCell<Group, Group> addCell = new TableCell<>() {
                 public void updateItem(Group group, boolean empty) {
                     super.updateItem(group, empty);
                     if(empty) {
                         setGraphic(null);
-                    }
-                    else {
+                    } else {
                         setGraphic(buttonsSettings);
                     }
                 }
             };
             settingsButton.setOnMouseClicked(event -> {
-                // Здесь нужно сделать чтобы выскакивала панель с обновлением этой строки
+                TableRow<Group> row = addCell.getTableRow();
+                selectedGroup = row.getItem();
+                showGroupInfo();
             });
 
             deleteButton.setOnMouseClicked(event -> {
-                // Здесь нужно сделать чтобы было удаление этой группы
+                TableRow<Group> row = addCell.getTableRow();
+                selectedGroup = row.getItem();
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Подтвердите действие");
+                alert.setHeaderText("Удаление группы");
+                alert.setContentText("Вы точно намерены удалить данную группу?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    boolean res = httpUtil.deleteGroupById(selectedGroup.getId());
+                    if(res) {
+                        selectedGroup = null;
+                        reloadGroups();
+                    }
+                }
             });
             return addCell;
         });
@@ -257,18 +273,23 @@ public class GroupsPane extends BorderPane {
                     Group group = row.getItem();
                     selectedGroup = group;
 
-                    groupName.setText(group.getName());
-                    faculty.setValue(group.getFaculty());
-                    programType.setValue(group.getProgramType());
-                    program.setText(group.getProgram());
-                    studyForm.setValue(group.getStudyForm());
-                    formPane.setVisible(true);
+                    showGroupInfo();
                 }
             });
             return row;
         });
 
         setCenter(stackPane);
+    }
+
+    private void showGroupInfo() {
+
+        groupName.setText(selectedGroup.getName());
+        faculty.setValue(selectedGroup.getFaculty());
+        programType.setValue(selectedGroup.getProgramType());
+        program.setText(selectedGroup.getProgram());
+        studyForm.setValue(selectedGroup.getStudyForm());
+        formPane.setVisible(true);
     }
 
     private void reloadGroups() {

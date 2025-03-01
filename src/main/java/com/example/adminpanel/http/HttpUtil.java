@@ -130,4 +130,20 @@ public class HttpUtil {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public boolean deleteGroupById(int id) {
+		try {
+
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/group/" + id))
+					.DELETE()
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+			return response.statusCode() == 200;
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

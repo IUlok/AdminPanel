@@ -21,9 +21,10 @@ import java.util.List;
 // Панель создания нового пользователя
 public class NewUserPane extends BorderPane {
 
+    // Класс-утилита для работы с HTTP-запросами к серверу
     private final HttpUtil httpUtil = new HttpUtil();
 
-    // Создание элементов ввода
+    // Элементы ввода
     private final TextField firstName = new TextField();
     private final TextField lastName = new TextField();
     private final TextField patronymic = new TextField();
@@ -153,67 +154,64 @@ public class NewUserPane extends BorderPane {
             }
         });
 
-        studentChoice.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean isNowSelected) {
-                if(isNowSelected) {
-                    // Выбор студент: Изменение стилей
-                    inputForm.setVisible(true);
-                    studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
-                    prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
-                    studentChoice.getStyleClass().add("studentChoice1");
-                    prepodChoice.getStyleClass().add("prepodChoice");
+        studentChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
+            if(isNowSelected) {
+                // Выбор студент: Изменение стилей
+                inputForm.setVisible(true);
+                studentChoice.getStyleClass().removeAll("studentChoice", "studentChoice1");
+                prepodChoice.getStyleClass().removeAll("prepodChoice", "prepodChoice1");
+                studentChoice.getStyleClass().add("studentChoice1");
+                prepodChoice.getStyleClass().add("prepodChoice");
 
-                    // Получение списка имён групп
-                    List<String> groups = httpUtil.getGroupNames();
-                    ObservableList<String> groupOL = FXCollections.observableArrayList(groups);
-                    groupSelect = new ComboBox<>(groupOL);
+                // Получение списка имён групп
+                List<String> groups = httpUtil.getGroupNames();
+                ObservableList<String> groupOL = FXCollections.observableArrayList(groups);
+                groupSelect = new ComboBox<>(groupOL);
 
-                    ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
-                    compensationBox = new ComboBox<>(compensation);
+                ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
+                compensationBox = new ComboBox<>(compensation);
 
-                    inputForm.getChildren().removeAll(degreeBox, positionBox, departmentBox);
-                    inputForm.add(groupSelect, 0, 5);
-                    inputForm.add(compensationBox, 0, 6);
-                    inputForm.add(new Text(), 0, 7);
+                inputForm.getChildren().removeAll(degreeBox, positionBox, departmentBox);
+                inputForm.add(groupSelect, 0, 5);
+                inputForm.add(compensationBox, 0, 6);
+                inputForm.add(new Text(), 0, 7);
 
-                    Button sendButton = new Button("Создать");
+                Button sendButton = new Button("Создать");
 
-                    FlowPane sendPane = new FlowPane(sendButton);
-                    sendPane.setAlignment(Pos.CENTER);
-                    sendPane.setPadding(new Insets(0, 0, 50, 0));
-                    setBottom(sendPane);
+                FlowPane sendPane = new FlowPane(sendButton);
+                sendPane.setAlignment(Pos.CENTER);
+                sendPane.setPadding(new Insets(0, 0, 50, 0));
+                setBottom(sendPane);
 
-                    sendButton.setOnAction(e -> {
-                        List<String> unfilledFields = new ArrayList<>();
-                        if(lastName.getText().isBlank()) {
-                            unfilledFields.add("Фамилия");
-                        }
-                        if(firstName.getText().isBlank()) {
-                            unfilledFields.add("Имя");
-                        }
-                        if(groupSelect.getValue() == null) {
-                            unfilledFields.add("Группа");
-                        }
+                sendButton.setOnAction(e -> {
+                    List<String> unfilledFields = new ArrayList<>();
+                    if(lastName.getText().isBlank()) {
+                        unfilledFields.add("Фамилия");
+                    }
+                    if(firstName.getText().isBlank()) {
+                        unfilledFields.add("Имя");
+                    }
+                    if(groupSelect.getValue() == null) {
+                        unfilledFields.add("Группа");
+                    }
 
-                        if(!unfilledFields.isEmpty()) {
-                            errorInfo.setText("Необходимо заполнить поле " + unfilledFields.getFirst());
-                            return;
-                        }
+                    if(!unfilledFields.isEmpty()) {
+                        errorInfo.setText("Необходимо заполнить поле " + unfilledFields.getFirst());
+                        return;
+                    }
 
-                        User newUser = new User();
-                        newUser.setFirstName(firstName.getText());
-                        newUser.setLastName(lastName.getText());
-                        newUser.setPatronymic(patronymic.getText());
-                        newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
-                        newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
-                        newUser.setRole("student");
-                        newUser.setGroupName(groupSelect.getValue());
-                        newUser.setReimbursement(compensationBox.getValue());
+                    User newUser = new User();
+                    newUser.setFirstName(firstName.getText());
+                    newUser.setLastName(lastName.getText());
+                    newUser.setPatronymic(patronymic.getText());
+                    newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
+                    newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
+                    newUser.setRole("student");
+                    newUser.setGroupName(groupSelect.getValue());
+                    newUser.setReimbursement(compensationBox.getValue());
 
-                        System.out.println(httpUtil.saveNewUser(newUser));
-                    });
-                }
+                    System.out.println(httpUtil.saveNewUser(newUser));
+                });
             }
         });
     }
