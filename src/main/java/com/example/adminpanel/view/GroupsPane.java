@@ -9,12 +9,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.util.*;
-import java.util.concurrent.Flow;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GroupsPane extends BorderPane {
 
@@ -36,8 +37,14 @@ public class GroupsPane extends BorderPane {
     // Группа, с которой ведётся работа
     private Group selectedGroup;
 
+    private Text errorInfo;
+
     public GroupsPane() {
         setPrefSize(880, 768);
+
+        errorInfo = new Text();
+        errorInfo.setFill(Color.RED);
+
 
         List<Group> groupList = httpUtil.getGroups(20);
 
@@ -146,7 +153,7 @@ public class GroupsPane extends BorderPane {
         facultyColumn.prefWidthProperty().bind(table.widthProperty().multiply(1));
         table.getColumns().add(facultyColumn);
 
-        TableColumn<Group, String> programTypeColumn = new TableColumn<>("Тип направления");
+        TableColumn<Group, String> programTypeColumn = new TableColumn<>("Образование");
         programTypeColumn.setCellValueFactory(new PropertyValueFactory<>("programType"));
         programTypeColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.7));
         table.getColumns().add(programTypeColumn);
@@ -190,19 +197,7 @@ public class GroupsPane extends BorderPane {
                 TableRow<Group> row = addCell.getTableRow();
                 selectedGroup = row.getItem();
 
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Подтвердите действие");
-                alert.setHeaderText("Удаление группы");
-                alert.setContentText("Вы точно намерены удалить данную группу?");
-
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.get() == ButtonType.OK){
-                    boolean res = httpUtil.deleteGroupById(selectedGroup.getId());
-                    if(res) {
-                        selectedGroup = null;
-                        reloadGroups();
-                    }
-                }
+                deleteMethod();
             });
             return addCell;
         });
@@ -230,18 +225,30 @@ public class GroupsPane extends BorderPane {
         formPane.add(groupName, 1, 0);
         formPane.add(new Text("Факультет: "), 0, 1);
         formPane.add(faculty, 1, 1);
-        formPane.add(new Text("Тип направления: "), 0, 2);
+        formPane.add(new Text("Образование: "), 0, 2);
         formPane.add(programType, 1, 2);
         formPane.add(new Text("Направление: "), 0, 3);
         formPane.add(program, 1, 3);
         formPane.add(new Text("Форма обучения: "), 0, 4);
         formPane.add(studyForm, 1, 4);
+        formPane.add(errorInfo, 0, 7);
 
         Button saveButton = new Button("Сохранить группу");
         saveButton.setOnAction(e -> {
+            List<String> unfilledFields = new ArrayList<>();
+            if(groupName.getText().isBlank()) unfilledFields.add("Название группы");
+            if(faculty.getValue() == "") unfilledFields.add("Факультет");
+            if(programType.getValue() == "") unfilledFields.add("Образование");
+            if(program.getText().isBlank()) unfilledFields.add("Направление");
+            if(studyForm.getValue() == "") unfilledFields.add("Форма обучения");
+            if(!unfilledFields.isEmpty()){
+                StringBuilder str = new StringBuilder();
+                for(String s : unfilledFields) str.append(s).append(", ");
+                errorInfo.setText("Необходимо заполнить следующие поля: " + str);
+                return;
+            }
             Group group = new Group();
-            if(selectedGroup != null)
-                group.setId(selectedGroup.getId());
+            if(selectedGroup != null) group.setId(selectedGroup.getId());
             group.setName(groupName.getText());
             group.setFaculty(faculty.getValue());
             group.setProgramType(programType.getValue());
@@ -267,15 +274,27 @@ public class GroupsPane extends BorderPane {
         stackPane.getChildren().add(formPane);
 
         table.setRowFactory(tv -> {
+            AtomicBoolean flag = new AtomicBoolean(false);
             TableRow<Group> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
-                if(e.getClickCount() == 2 && !(row.isEmpty())) {
+                if (e.getClickCount() == 1 && !(row.isEmpty())) {
+                    flag.set(true);
+                }
+                if (e.getClickCount() == 2 && !(row.isEmpty())) {
                     Group group = row.getItem();
                     selectedGroup = group;
 
                     showGroupInfo();
                 }
             });
+            if (flag.get()){
+                row.setOnKeyPressed(ke -> {
+                    System.out.println(ke.getCode().getName());
+                    if (ke.getCode() == KeyCode.DELETE) {
+                        deleteMethod();
+                    }
+                });
+            }
             return row;
         });
 
@@ -310,5 +329,21 @@ public class GroupsPane extends BorderPane {
         List<Group> groups = httpUtil.findGroupByParam(selectedFindParam, searchInput.getText());
         table.getItems().clear();
         table.getItems().addAll(groups);
+    }
+
+    private void deleteMethod(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Подтвердите действие");
+        alert.setHeaderText("Удаление группы");
+        alert.setContentText("Вы точно намерены удалить данную группу?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            boolean res = httpUtil.deleteGroupById(selectedGroup.getId());
+            if(res) {
+                selectedGroup = null;
+                reloadGroups();
+            }
+        }
     }
 }
