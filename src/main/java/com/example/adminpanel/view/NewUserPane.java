@@ -41,10 +41,10 @@ public class NewUserPane extends BorderPane {
     private ComboBox<String> groupSelect;
 
     public NewUserPane() {
-        setPrefSize(768, 880);
+        setPrefSize(880, 768);
 
         // Переключение выбора типа пользователя
-        FlowPane choiceBox = new FlowPane();
+        GridPane choiceBox = new GridPane();
         choiceBox.setAlignment(Pos.CENTER);
         choiceBox.setPadding(new Insets(50, 0, 0, 0));
         FlowPane choicePane = new FlowPane();
