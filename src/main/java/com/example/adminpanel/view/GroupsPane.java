@@ -5,6 +5,8 @@ import com.example.adminpanel.entity.Group;
 import com.example.adminpanel.http.HttpUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -272,13 +274,15 @@ public class GroupsPane extends BorderPane {
         formPane.add(panelButtons, 1,5);
         formPane.setVisible(false);
         stackPane.getChildren().add(formPane);
+        // Установка на таблицу свойства получения фокуса
+        table.setFocusTraversable(true);
 
         table.setRowFactory(tv -> {
-            AtomicBoolean flag = new AtomicBoolean(false);
             TableRow<Group> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 1 && !(row.isEmpty())) {
-                    flag.set(true);
+                    // Установка фокуса на строку
+                    row.requestFocus();
                 }
                 if (e.getClickCount() == 2 && !(row.isEmpty())) {
                     Group group = row.getItem();
@@ -287,14 +291,17 @@ public class GroupsPane extends BorderPane {
                     showGroupInfo();
                 }
             });
-            if (flag.get()){
-                row.setOnKeyPressed(ke -> {
-                    System.out.println(ke.getCode().getName());
-                    if (ke.getCode() == KeyCode.DELETE) {
+            row.setOnKeyPressed(ke -> {
+                System.out.println(ke.getCode().getName());
+                if (ke.getCode() == KeyCode.DELETE) {
+                    Group selectedItem = table.getSelectionModel().getSelectedItem();
+                    if (selectedItem != null) {
+                        selectedGroup = selectedItem;
                         deleteMethod();
+                        ke.consume();
                     }
-                });
-            }
+                }
+            });
             return row;
         });
 
