@@ -1,5 +1,6 @@
 package com.example.adminpanel.view;
 
+import com.example.adminpanel.entity.Group;
 import com.example.adminpanel.entity.User;
 import com.example.adminpanel.http.HttpUtil;
 import javafx.application.Platform;
@@ -19,6 +20,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 // Панель создания нового пользователя
 public class NewUserPane extends BorderPane {
@@ -42,6 +44,7 @@ public class NewUserPane extends BorderPane {
     // Элементы ввода студента
     private ComboBox<String> compensationBox;
     private ComboBox<String> groupSelect;
+    private ComboBox<String> facultiesSelect;
 
     private boolean isStudentForm;
 
@@ -132,21 +135,34 @@ public class NewUserPane extends BorderPane {
                 studentChoice.getStyleClass().add("studentChoice1");
                 prepodChoice.getStyleClass().add("prepodChoice");
 
-                // Получение списка имён групп
-                List<String> groups = httpUtil.getGroupNames();
-                ObservableList<String> groupOL = FXCollections.observableArrayList(groups);
-                groupSelect = new ComboBox<>(groupOL);
+                // Получение списка факультетов
+                List<String> faculties = httpUtil.getFaculties();
+                ObservableList<String> facultiesOL = FXCollections.observableArrayList(faculties);
+                facultiesSelect = new ComboBox<>(facultiesOL);
+
+                groupSelect = new ComboBox<>();
+                groupSelect.setDisable(true);
+
+                // При выборе факультета из списка
+                facultiesSelect.setOnAction(e -> {
+                    String faculty = facultiesSelect.getValue();
+                    // Получение имён групп по факультету
+                    List<String> groupsByFaculty = httpUtil.findGroupByParam("faculty", faculty)
+                            .stream().map(Group::getName).toList();
+                    groupSelect.setItems(FXCollections.observableArrayList(groupsByFaculty));
+                    groupSelect.setDisable(false);
+                });
 
                 ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
                 compensationBox = new ComboBox<>(compensation);
                 System.out.println(inputForm.getChildren().removeAll(degreeBox, positionBox, departmentBox));
                 Platform.runLater(() -> {
-                            if(!inputForm.getChildren().contains(groupSelect)) inputForm.add(groupSelect, 0, 5);
-                            if(!inputForm.getChildren().contains(compensationBox)) inputForm.add(compensationBox, 0, 6);
-                            if(!inputForm.getChildren().contains(ZAGlushka)) inputForm.add(ZAGlushka, 0, 7);
+                            if(!inputForm.getChildren().contains(facultiesSelect)) inputForm.add(facultiesSelect, 0, 5);
+                            if(!inputForm.getChildren().contains(groupSelect)) inputForm.add(groupSelect, 0, 6);
+                            if(!inputForm.getChildren().contains(compensationBox)) inputForm.add(compensationBox, 0, 7);
+                            if(!inputForm.getChildren().contains(ZAGlushka)) inputForm.add(ZAGlushka, 0, 8);
                         }
                 );
-
             }
             else{
                 isStudentForm = false;
@@ -174,7 +190,7 @@ public class NewUserPane extends BorderPane {
 
                 ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
                 degreeBox = new ComboBox<>(degree);
-                System.out.println(inputForm.getChildren().removeAll(compensationBox, groupSelect, ZAGlushka));
+                System.out.println(inputForm.getChildren().removeAll(compensationBox, facultiesSelect, groupSelect, ZAGlushka));
                 //for(Node i : inputForm.getChildren()) System.out.println(i + "\n");
                 Platform.runLater(()-> {
                     if(!inputForm.getChildren().contains(departmentBox)) inputForm.add(departmentBox, 0, 5);

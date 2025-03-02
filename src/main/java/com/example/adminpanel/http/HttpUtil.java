@@ -97,7 +97,7 @@ public class HttpUtil {
 	public List<Group> findGroupByParam(String paramName, String paramValue) {
 		try {
 			HttpRequest request = HttpRequest.newBuilder()
-					.uri(new URI(serverUri + "/group/find?" + paramName + "=" + paramValue))
+					.uri(new URI(serverUri + "/group/find?" + paramName + "=" + replaceSpaces(paramValue)))
 					.GET().build();
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 			if(response.statusCode() != 200) {
@@ -131,6 +131,21 @@ public class HttpUtil {
 		}
 	}
 
+	public List<String> getFaculties() {
+		try {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/group/faculties"))
+					.GET()
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return new Gson().fromJson(response.body(), new TypeToken<ArrayList<String>>(){}.getType());
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public boolean deleteGroupById(int id) {
 		try {
 
@@ -145,5 +160,9 @@ public class HttpUtil {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String replaceSpaces(String str) {
+		return str.replaceAll(" ", "+");
 	}
 }
