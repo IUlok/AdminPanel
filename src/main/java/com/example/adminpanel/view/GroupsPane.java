@@ -5,8 +5,6 @@ import com.example.adminpanel.entity.Group;
 import com.example.adminpanel.http.HttpUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -17,7 +15,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GroupsPane extends BorderPane {
 
@@ -333,7 +330,7 @@ public class GroupsPane extends BorderPane {
             return;
         }
 
-        List<Group> groups = httpUtil.findGroupByParam(selectedFindParam, searchInput.getText());
+        List<Group> groups = httpUtil.findGroupsByParam(selectedFindParam, searchInput.getText());
         table.getItems().clear();
         table.getItems().addAll(groups);
     }

@@ -144,7 +144,7 @@ public class NewUserPane extends BorderPane {
                 facultiesSelect.setOnAction(e -> {
                     String faculty = facultiesSelect.getValue();
                     // Получение имён групп по факультету
-                    List<String> groupsByFaculty = httpUtil.findGroupByParam("faculty", faculty)
+                    List<String> groupsByFaculty = httpUtil.findGroupsByParam("faculty", faculty)
                             .stream().map(Group::getName).toList();
                     groupSelect.setItems(FXCollections.observableArrayList(groupsByFaculty));
                     groupSelect.setDisable(false);
