@@ -33,4 +33,6 @@ public class User {
     private String academicTitle;
 
     private String academicDegree;
+
+    private boolean isBlocked;
 }

@@ -5,12 +5,10 @@ import com.example.adminpanel.entity.User;
 import com.example.adminpanel.http.HttpUtil;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -20,7 +18,6 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 // Панель создания нового пользователя
 public class NewUserPane extends BorderPane {
@@ -235,7 +232,7 @@ public class NewUserPane extends BorderPane {
                     newUser.setAcademicDegree(degreeBox.getValue());
                 }
 
-                System.out.println(httpUtil.saveNewUser(newUser));
+                System.out.println(httpUtil.saveUser(newUser));
             });
         };
         studentChoice.selectedProperty().addListener(changeListener);

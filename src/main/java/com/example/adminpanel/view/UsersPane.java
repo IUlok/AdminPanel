@@ -40,19 +40,19 @@ public class UsersPane extends BorderPane {
     private Button saveButton;
 
     private final TextField searchInput = new TextField();
-    private final TableView<User> table;
+    //private final TableView<User> table;
 
     // В этой переменной хранится имя свойства, по которому производится поиск
     private String selectedFindParam = "lastname";
 
     private final GridPane formPane = new GridPane();
 
-    // Группа, с которой ведётся работа
+    // Пользователь, с которым ведётся работа
     private User selectedUser;
 
     private Text errorInfo;
 
-    public UsersPane() {
+    /*public UsersPane() {
         setPrefSize(880, 768);
 
         errorInfo = new Text();
@@ -345,5 +345,5 @@ public class UsersPane extends BorderPane {
                 reloadGroups();
             }
         }
-    }
+    }*/
 }

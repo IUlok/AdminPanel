@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -55,14 +54,14 @@ public class HttpUtil {
 		}
 	}
 
-	public boolean saveNewUser(User user) {
+	public boolean saveUser(User user) {
 		try {
 			Gson gson = new GsonBuilder()
 					.setDateFormat("yyyy-MM-dd").create();
 			String userJson = gson.toJson(user);
 
 			HttpRequest request = HttpRequest.newBuilder()
-					.uri(new URI(serverUri + "/user/create"))
+					.uri(new URI(serverUri + "/user/"))
 					.header("Content-type", "application/json")
 					.POST(HttpRequest.BodyPublishers.ofString(userJson))
 					.build();
