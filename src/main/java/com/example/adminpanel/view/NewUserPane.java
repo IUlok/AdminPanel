@@ -2,6 +2,7 @@ package com.example.adminpanel.view;
 
 import com.example.adminpanel.entity.User;
 import com.example.adminpanel.http.HttpUtil;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -49,9 +50,12 @@ public class NewUserPane extends BorderPane {
     private FlowPane sendAlignmentPane;
 
     private Text errorInfo;
+    private Text ZAGlushka;
 
     public NewUserPane() {
         setPrefSize(880, 768);
+
+        ZAGlushka = new Text();
 
         // Переключение выбора типа пользователя
         GridPane choiceBox = new GridPane();
@@ -135,10 +139,13 @@ public class NewUserPane extends BorderPane {
 
                 ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
                 compensationBox = new ComboBox<>(compensation);
-                inputForm.getChildren().removeAll(degreeBox, positionBox, departmentBox);
-                inputForm.add(groupSelect, 0, 5);
-                inputForm.add(compensationBox, 0, 6);
-                inputForm.add(new Text(), 0, 7);
+                System.out.println(inputForm.getChildren().removeAll(degreeBox, positionBox, departmentBox));
+                Platform.runLater(() -> {
+                            if(!inputForm.getChildren().contains(groupSelect)) inputForm.add(groupSelect, 0, 5);
+                            if(!inputForm.getChildren().contains(compensationBox)) inputForm.add(compensationBox, 0, 6);
+                            if(!inputForm.getChildren().contains(ZAGlushka)) inputForm.add(ZAGlushka, 0, 7);
+                        }
+                );
 
             }
             else{
@@ -167,11 +174,13 @@ public class NewUserPane extends BorderPane {
 
                 ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
                 degreeBox = new ComboBox<>(degree);
-                inputForm.getChildren().removeAll(compensationBox, groupSelect);
+                System.out.println(inputForm.getChildren().removeAll(compensationBox, groupSelect, ZAGlushka));
                 //for(Node i : inputForm.getChildren()) System.out.println(i + "\n");
-                inputForm.add(departmentBox, 0, 5);
-                inputForm.add(positionBox, 0, 6);
-                inputForm.add(degreeBox, 0, 7);
+                Platform.runLater(()-> {
+                    if(!inputForm.getChildren().contains(departmentBox)) inputForm.add(departmentBox, 0, 5);
+                    if(!inputForm.getChildren().contains(positionBox)) inputForm.add(positionBox, 0, 6);
+                    if(!inputForm.getChildren().contains(degreeBox)) inputForm.add(degreeBox, 0, 7);
+                });
             }
             createButton.setOnAction(e -> {
                 List<String> unfilledFields = new ArrayList<>();
