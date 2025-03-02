@@ -93,7 +93,7 @@ public class HttpUtil {
 		}
 	}
 
-	public List<Group> findGroupByParam(String paramName, String paramValue) {
+	public List<Group> findGroupsByParam(String paramName, String paramValue) {
 		try {
 			HttpRequest request = HttpRequest.newBuilder()
 					.uri(new URI(serverUri + "/group/find?" + paramName + "=" + replaceSpaces(paramValue)))
@@ -147,7 +147,6 @@ public class HttpUtil {
 
 	public boolean deleteGroupById(int id) {
 		try {
-
 			HttpRequest request = HttpRequest.newBuilder()
 					.uri(new URI(serverUri + "/group/" + id))
 					.DELETE()
@@ -155,6 +154,43 @@ public class HttpUtil {
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 			return response.statusCode() == 200;
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public boolean deleteUser(int id) {
+		try {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/user/" + id))
+					.DELETE()
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+			return response.statusCode() == 200;
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<User> findUsersByParam(String paramName, String paramValue) {
+		try {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(new URI(serverUri + "/user/find?" + paramName + "=" + replaceSpaces(paramValue)))
+					.GET().build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			if(response.statusCode() != 200) {
+				return null;
+			}
+
+			Gson gson = new GsonBuilder()
+					.setDateFormat("yyyy-MM-dd").create();
+
+			List<User> users = gson.fromJson(response.body(), new TypeToken<ArrayList<User>>(){}.getType());
+			System.out.println(users);
+			return users;
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

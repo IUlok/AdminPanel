@@ -1,6 +1,5 @@
 package com.example.adminpanel.view;
 
-import com.example.adminpanel.entity.Group;
 import com.example.adminpanel.entity.User;
 import com.example.adminpanel.http.HttpUtil;
 import javafx.collections.FXCollections;
@@ -34,16 +33,16 @@ public class UsersPane extends BorderPane {
 
     // Элементы ввода студента
     private ComboBox<String> compensationBox;
-    private ComboBox<String> groupSelect;
-    private ComboBox<String> facultiesSelect;
+    private ComboBox<String> groupSelect = new ComboBox<>();
+    private CheckBox isBlocked = new CheckBox("Блокировка");
 
     private Button saveButton;
 
     private final TextField searchInput = new TextField();
-    //private final TableView<User> table;
+    private final TableView<User> table;
 
     // В этой переменной хранится имя свойства, по которому производится поиск
-    private String selectedFindParam = "lastname";
+    private String selectedFindParam = "lastName";
 
     private final GridPane formPane = new GridPane();
 
@@ -52,7 +51,7 @@ public class UsersPane extends BorderPane {
 
     private Text errorInfo;
 
-    /*public UsersPane() {
+    public UsersPane() {
         setPrefSize(880, 768);
 
         errorInfo = new Text();
@@ -79,17 +78,16 @@ public class UsersPane extends BorderPane {
         searchButton.setPrefSize(50,50);
         searchPanel.getChildren().add(searchButton);
         searchButton.setOnMouseClicked((e) -> {
-            getGroupsWithParamValue();
+            getUsersWithParamValue();
         });
 
         RadioButton lastnameChoice = new RadioButton("по фамилии");
         RadioButton groupChoice = new RadioButton("по группе");
         RadioButton departmentChoice = new RadioButton("по кафедре");
-        RadioButton typeChoice = new RadioButton("по форме обучения");
 
         lastnameChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
             if(isNowSelected) {
-                selectedFindParam = "lastname";
+                selectedFindParam = "lastName";
             }
         });
 
@@ -105,11 +103,6 @@ public class UsersPane extends BorderPane {
             }
         });
 
-        typeChoice.selectedProperty().addListener((observableValue, aBoolean, isNowSelected) -> {
-            if(isNowSelected) {
-                selectedFindParam = "studyForm";
-            }
-        });
 
         FlowPane filterPane = new FlowPane();
         filterPane.setPadding(new Insets(20,0,0,0));
@@ -119,9 +112,8 @@ public class UsersPane extends BorderPane {
         lastnameChoice.setToggleGroup(filterButtons);
         groupChoice.setToggleGroup(filterButtons);
         departmentChoice.setToggleGroup(filterButtons);
-        typeChoice.setToggleGroup(filterButtons);
         lastnameChoice.setSelected(true);
-        filterPane.getChildren().addAll(lastnameChoice, groupChoice, departmentChoice, typeChoice);
+        filterPane.getChildren().addAll(lastnameChoice, groupChoice, departmentChoice);
 
         searchGrand.add(searchPanel, 0, 1);
         searchGrand.add(filterPane, 0,2);
@@ -140,12 +132,12 @@ public class UsersPane extends BorderPane {
 
         TableColumn<User, String> lastNameColumn = new TableColumn<>("Фамилия");
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        lastNameColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
+        lastNameColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.7));
         table.getColumns().add(lastNameColumn);
 
         TableColumn<User, String> firstNameColumn = new TableColumn<>("Имя");
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        firstNameColumn.prefWidthProperty().bind(table.widthProperty().multiply(1));
+        firstNameColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
         table.getColumns().add(firstNameColumn);
 
         TableColumn<User, String> patronymicColumn = new TableColumn<>("Отчество");
@@ -155,8 +147,13 @@ public class UsersPane extends BorderPane {
 
         TableColumn<User, String> roleColumn = new TableColumn<>("Тип пользователя");
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        roleColumn.prefWidthProperty().bind(table.widthProperty().multiply(3));
+        roleColumn.prefWidthProperty().bind(table.widthProperty().multiply(1));
         table.getColumns().add(roleColumn);
+
+        TableColumn<User, String> untilColumn = new TableColumn<>("Истекает");
+        untilColumn.setCellValueFactory(new PropertyValueFactory<>("enabledUntil"));
+        untilColumn.prefWidthProperty().bind(table.widthProperty().multiply(1));
+        table.getColumns().add(untilColumn);
 
         TableColumn<User, User> settings = new TableColumn<>();
         settings.setCellFactory(col -> {
@@ -173,8 +170,8 @@ public class UsersPane extends BorderPane {
             buttonsSettings.setAlignment(Pos.CENTER);
 
             TableCell<User, User> addCell = new TableCell<>() {
-                public void updateItem(User group, boolean empty) {
-                    super.updateItem(group, empty);
+                public void updateItem(User user, boolean empty) {
+                    super.updateItem(user, empty);
                     if(empty) {
                         setGraphic(null);
                     } else {
@@ -185,7 +182,7 @@ public class UsersPane extends BorderPane {
             settingsButton.setOnMouseClicked(event -> {
                 TableRow<User> row = addCell.getTableRow();
                 selectedUser = row.getItem();
-                showGroupInfo();
+                showUserInfo();
             });
 
             deleteButton.setOnMouseClicked(event -> {
@@ -200,71 +197,78 @@ public class UsersPane extends BorderPane {
         table.getColumns().add(settings);
 
         stackPane.getChildren().add(table);
-        formPane.setMaxSize(400, 300);
-        formPane.getStyleClass().add("formGroupPane");
-        formPane.setAlignment(Pos.CENTER);
-        formPane.setVgap(10);
-        ObservableList<String> facultyList = FXCollections.observableArrayList("Автоматизация и интеллектуальные технологии",
-                "Транспортное строительство", "Управление перевозками и логистика", "Факультет безотрывных форм обучения",
-                "Промышленное и гражданское строительство", "Транспортные и энергетические системы", "Экономика и менеджмент");
-        faculty = new ComboBox<>(facultyList);
-        ObservableList<String> programTypeList = FXCollections.observableArrayList("Бакалавриат", "Специалитет",
-                "Магистратура");
-        programType = new ComboBox<>(programTypeList);
-        ObservableList<String> studyFormList = FXCollections.observableArrayList("Очная", "Очно-заочная",
-                "Заочная");
-        studyForm = new ComboBox<>(studyFormList);
 
-        formPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-        formPane.add(new Text("Название группы: "), 0, 0);
-        formPane.add(groupName, 1, 0);
-        formPane.add(new Text("Факультет: "), 0, 1);
-        formPane.add(faculty, 1, 1);
-        formPane.add(new Text("Образование: "), 0, 2);
-        formPane.add(programType, 1, 2);
-        formPane.add(new Text("Направление: "), 0, 3);
-        formPane.add(program, 1, 3);
-        formPane.add(new Text("Форма обучения: "), 0, 4);
-        formPane.add(studyForm, 1, 4);
-        formPane.add(errorInfo, 0, 7);
+        ObservableList<String> department = FXCollections.observableArrayList(
+                "Автоматика и телемеханика на железных дорогах", "Высшая математика",
+                "Информационные и вычислительные системы", "Информатика и информационная безопасность",
+                "Электротехника и теплоэнергетика", "Электрическая связь", "Электроснабжение железных дорог",
+                "Архитектурно-строительное проектирование", "Водоснабжение, водоотведение и гидравлика",
+                "Инженерная химия и естествознание", "Основания и фундаменты");
+        departmentBox = new ComboBox<>(department);
 
-        Button saveButton = new Button("Сохранить группу");
+        ObservableList<String> position = FXCollections.observableArrayList(
+                "Профессор", "Старший преподаватель", "Доцент", "Ассистент", "Заведующий кафедрой",
+                "Декан", "Проректор", "Ректор");
+        positionBox = new ComboBox<>(position);
+
+        ObservableList<String> degree = FXCollections.observableArrayList("Кандидат наук", "Доктор наук");
+        degreeBox = new ComboBox<>(degree);
+
+        ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
+        compensationBox = new ComboBox<>(compensation);
+
+        Button saveButton = new Button("Сохранить пользователя");
         saveButton.setOnAction(e -> {
-            List<String> unfilledFields = new ArrayList<>();
-            if(groupName.getText().isBlank()) unfilledFields.add("Название группы");
-            if(faculty.getValue() == "") unfilledFields.add("Факультет");
-            if(programType.getValue() == "") unfilledFields.add("Образование");
-            if(program.getText().isBlank()) unfilledFields.add("Направление");
-            if(studyForm.getValue() == "") unfilledFields.add("Форма обучения");
-            if(!unfilledFields.isEmpty()){
-                StringBuilder str = new StringBuilder();
-                for(String s : unfilledFields) str.append(s).append(", ");
-                errorInfo.setText("Необходимо заполнить следующие поля: " + str);
-                return;
-            }
-            Group group = new Group();
-            if(selectedUser != null) group.setId(selectedUser.getId());
-            group.setName(groupName.getText());
-            group.setFaculty(faculty.getValue());
-            group.setProgramType(programType.getValue());
-            group.setProgram(program.getText());
-            group.setStudyForm(studyForm.getValue());
-
-            System.out.println(httpUtil.saveGroup(group));
+//            List<String> unfilledFields = new ArrayList<>();
+//            if(userName.getText().isBlank()) unfilledFields.add("Название группы");
+//            if(faculty.getValue() == "") unfilledFields.add("Факультет");
+//            if(programType.getValue() == "") unfilledFields.add("Образование");
+//            if(program.getText().isBlank()) unfilledFields.add("Направление");
+//            if(studyForm.getValue() == "") unfilledFields.add("Форма обучения");
+//            if(!unfilledFields.isEmpty()){
+//                StringBuilder str = new StringBuilder();
+//                for(String s : unfilledFields) str.append(s).append(", ");
+//                errorInfo.setText("Необходимо заполнить следующие поля: " + str);
+//                return;
+//            }
+//            Group group = new Group();
+//            if(selectedUser != null) group.setId(selectedUser.getId());
+//            group.setName(groupName.getText());
+//            group.setFaculty(faculty.getValue());
+//            group.setProgramType(programType.getValue());
+//            group.setProgram(program.getText());
+//            group.setStudyForm(studyForm.getValue());
+//
+//            System.out.println(httpUtil.saveGroup(group));
             formPane.setVisible(false);
-            reloadGroups();
+            reloadUsers();
         });
 
         Button closeButton = new Button("Закрыть");
         closeButton.setOnAction(e1 -> {
             formPane.setVisible(false);
-            reloadGroups();
+            reloadUsers();
         });
         saveButton.setPrefWidth(120);
         FlowPane panelButtons = new FlowPane(saveButton, closeButton);
         panelButtons.setHgap(20);
 
-        formPane.add(panelButtons, 1,5);
+        formPane.setMaxSize(400, 300);
+        formPane.getStyleClass().add("formUserPane");
+        formPane.setAlignment(Pos.CENTER);
+        formPane.setVgap(10);
+        formPane.add(lastName, 1, 0);
+        formPane.add(firstName, 1, 1);
+        formPane.add(patronymic, 1, 2);
+        formPane.add(startingUsingAccountDate, 1, 3);
+        formPane.add(endingUsingAccountDate, 1, 4);
+        formPane.add(degreeBox, 1, 5);
+        formPane.add(departmentBox, 1, 6);
+        formPane.add(positionBox, 1, 7);
+        formPane.add(compensationBox, 1, 8);
+        formPane.add(groupSelect, 1, 9);
+        formPane.add(isBlocked, 1, 10);
+        formPane.add(panelButtons, 1,11);
         formPane.setVisible(false);
         stackPane.getChildren().add(formPane);
         // Установка на таблицу свойства получения фокуса
@@ -281,7 +285,7 @@ public class UsersPane extends BorderPane {
                     User user = row.getItem();
                     selectedUser = user;
 
-                    showGroupInfo();
+                    showUserInfo();
                 }
             });
             row.setOnKeyPressed(ke -> {
@@ -301,34 +305,51 @@ public class UsersPane extends BorderPane {
         setCenter(stackPane);
     }
 
-    private void showGroupInfo() {
+    private void showUserInfo() {
+        lastName.setText(selectedUser.getLastName());
+        firstName.setText(selectedUser.getFirstName());
+        patronymic.setText(selectedUser.getPatronymic());
+        startingUsingAccountDate.setValue(selectedUser.getEnabledFrom().toLocalDate());
+        endingUsingAccountDate.setValue(selectedUser.getEnabledUntil().toLocalDate());
+        isBlocked.setSelected(selectedUser.isBlocked());
 
-        groupName.setText(selectedUser.getName());
-        faculty.setValue(selectedUser.getFaculty());
-        programType.setValue(selectedUser.getProgramType());
-        program.setText(selectedUser.getProgram());
-        studyForm.setValue(selectedUser.getStudyForm());
+        if(selectedUser.getRole().equals("student")) {
+            compensationBox.setValue(selectedUser.getReimbursement());
+            List<String> groupList = httpUtil.getGroupNames();
+            groupSelect.setItems(FXCollections.observableArrayList(groupList));
+            groupSelect.setValue(selectedUser.getGroupName());
+            degreeBox.setDisable(true);
+            departmentBox.setDisable(true);
+            positionBox.setDisable(true);
+            compensationBox.setDisable(false);
+            groupSelect.setDisable(false);
+        }
+        else {
+            degreeBox.setValue(selectedUser.getAcademicDegree());
+            departmentBox.setValue(selectedUser.getDepartment());
+            positionBox.setValue(selectedUser.getAcademicTitle());
+            degreeBox.setDisable(false);
+            departmentBox.setDisable(false);
+            positionBox.setDisable(false);
+            compensationBox.setDisable(true);
+            groupSelect.setDisable(true);
+        }
+
         formPane.setVisible(true);
     }
 
-    private void reloadGroups() {
-        if(searchInput.getText().isBlank()) {
-            List<Group> newGroupList = httpUtil.getGroups(20);
-            table.getItems().clear();
-            table.getItems().addAll(newGroupList);
-        } else {
-            getGroupsWithParamValue();
-        }
+    private void reloadUsers() {
+        getUsersWithParamValue();
     }
 
-    private void getGroupsWithParamValue() {
+    private void getUsersWithParamValue() {
         if(searchInput.getText().isBlank()) {
             return;
         }
 
-        List<Group> groups = httpUtil.findGroupByParam(selectedFindParam, searchInput.getText());
+        List<User> users = httpUtil.findUsersByParam(selectedFindParam, searchInput.getText());
         table.getItems().clear();
-        table.getItems().addAll(groups);
+        table.getItems().addAll(users);
     }
 
     private void deleteMethod(){
@@ -342,8 +363,8 @@ public class UsersPane extends BorderPane {
             boolean res = httpUtil.deleteGroupById(selectedUser.getId());
             if(res) {
                 selectedUser = null;
-                reloadGroups();
+                reloadUsers();
             }
         }
-    }*/
+    }
 }

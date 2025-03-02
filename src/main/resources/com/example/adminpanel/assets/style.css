@@ -208,3 +208,14 @@
 .deleteButton:hover {
     -fx-background-color: #c4c4c4;
 }
+
+.formUserPane {
+    -fx-background-color: #c4c4c4;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10px;
+    -fx-border-color: #efefef;
+    -fx-border-insets: 30px;
+    -fx-background-insets: 5px;
+    -fx-border-width: 5px;
+}
