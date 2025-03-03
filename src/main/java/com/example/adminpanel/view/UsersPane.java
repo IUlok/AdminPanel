@@ -311,7 +311,7 @@ public class UsersPane extends BorderPane {
         patronymic.setText(selectedUser.getPatronymic());
         startingUsingAccountDate.setValue(selectedUser.getEnabledFrom().toLocalDate());
         endingUsingAccountDate.setValue(selectedUser.getEnabledUntil().toLocalDate());
-        isBlocked.setSelected(selectedUser.isBlocked());
+        isBlocked.setSelected(selectedUser.getIsBlocked());
 
         if(selectedUser.getRole().equals("student")) {
             compensationBox.setValue(selectedUser.getReimbursement());
