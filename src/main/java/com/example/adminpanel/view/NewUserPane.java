@@ -222,11 +222,11 @@ public class NewUserPane extends BorderPane {
                 newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
 
                 if(isStudentForm){
-                    newUser.setRole("student");
+                    newUser.setRole("Студент");
                     newUser.setGroupName(groupSelect.getValue());
                     newUser.setReimbursement(compensationBox.getValue());
                 } else{
-                    newUser.setRole("professor");
+                    newUser.setRole("Преподаватель");
                     newUser.setDepartment(departmentBox.getValue());
                     newUser.setAcademicTitle(positionBox.getValue());
                     newUser.setAcademicDegree(degreeBox.getValue());

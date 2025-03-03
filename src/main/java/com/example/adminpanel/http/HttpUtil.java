@@ -160,7 +160,7 @@ public class HttpUtil {
 		}
 	}
 
-	public boolean deleteUser(int id) {
+	public boolean deleteUserById(int id) {
 		try {
 			HttpRequest request = HttpRequest.newBuilder()
 					.uri(new URI(serverUri + "/user/" + id))

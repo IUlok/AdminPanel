@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.sql.Date;
 import java.util.*;
 
 public class UsersPane extends BorderPane {
@@ -25,6 +26,13 @@ public class UsersPane extends BorderPane {
 
     private final DatePicker startingUsingAccountDate = new DatePicker();
     private final DatePicker endingUsingAccountDate = new DatePicker();
+    private CheckBox isBlocked = new CheckBox("Блокировка");
+
+    // Переключатель типа пользователя
+    private ToggleGroup choiceButtons = new ToggleGroup();
+    private RadioButton studentChoice = new RadioButton("Студент");
+    private RadioButton prepodChoice = new RadioButton("Преподаватель");
+
 
     // Элементы ввода преподавателя
     private ComboBox<String> degreeBox;
@@ -34,7 +42,6 @@ public class UsersPane extends BorderPane {
     // Элементы ввода студента
     private ComboBox<String> compensationBox;
     private ComboBox<String> groupSelect = new ComboBox<>();
-    private CheckBox isBlocked = new CheckBox("Блокировка");
 
     private Button saveButton;
 
@@ -217,29 +224,46 @@ public class UsersPane extends BorderPane {
         ObservableList<String> compensation = FXCollections.observableArrayList("Бюджет", "Контракт", "Целевое");
         compensationBox = new ComboBox<>(compensation);
 
+        studentChoice.setToggleGroup(choiceButtons);
+        prepodChoice.setToggleGroup(choiceButtons);
+        FlowPane choicePane = new FlowPane();
+        choicePane.getChildren().addAll(studentChoice, prepodChoice);
+
+        studentChoice.setOnAction(e -> enableStudentElements());
+
+        prepodChoice.setOnAction(e -> enablePrepodElements());
+
         Button saveButton = new Button("Сохранить пользователя");
         saveButton.setOnAction(e -> {
-//            List<String> unfilledFields = new ArrayList<>();
-//            if(userName.getText().isBlank()) unfilledFields.add("Название группы");
-//            if(faculty.getValue() == "") unfilledFields.add("Факультет");
-//            if(programType.getValue() == "") unfilledFields.add("Образование");
-//            if(program.getText().isBlank()) unfilledFields.add("Направление");
-//            if(studyForm.getValue() == "") unfilledFields.add("Форма обучения");
-//            if(!unfilledFields.isEmpty()){
-//                StringBuilder str = new StringBuilder();
-//                for(String s : unfilledFields) str.append(s).append(", ");
-//                errorInfo.setText("Необходимо заполнить следующие поля: " + str);
-//                return;
-//            }
-//            Group group = new Group();
-//            if(selectedUser != null) group.setId(selectedUser.getId());
-//            group.setName(groupName.getText());
-//            group.setFaculty(faculty.getValue());
-//            group.setProgramType(programType.getValue());
-//            group.setProgram(program.getText());
-//            group.setStudyForm(studyForm.getValue());
-//
-//            System.out.println(httpUtil.saveGroup(group));
+            List<String> unfilledFields = new ArrayList<>();
+            if(lastName.getText().isBlank()) unfilledFields.add("Фамилия");
+            if(firstName.getText().isBlank()) unfilledFields.add("Имя");
+            if(!unfilledFields.isEmpty()){
+                StringBuilder str = new StringBuilder();
+                for(String s : unfilledFields) str.append(s).append(", ");
+                errorInfo.setText("Необходимо заполнить следующие поля: " + str);
+                return;
+            }
+            User user = new User();
+            if(selectedUser != null) user.setId(selectedUser.getId());
+            user.setFirstName(firstName.getText());
+            user.setLastName(lastName.getText());
+            user.setPatronymic(patronymic.getText());
+            user.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
+            user.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
+            user.setIsBlocked(isBlocked.isSelected());
+            if(studentChoice.isSelected()) {
+                user.setRole("Студент");
+                user.setReimbursement(compensationBox.getValue());
+                user.setGroupName(groupSelect.getValue());
+            } else {
+                user.setRole("Преподаватель");
+                user.setDepartment(departmentBox.getValue());
+                user.setAcademicDegree(degreeBox.getValue());
+                user.setAcademicTitle(positionBox.getValue());
+            }
+
+            System.out.println(httpUtil.saveUser(user));
             formPane.setVisible(false);
             reloadUsers();
         });
@@ -262,13 +286,15 @@ public class UsersPane extends BorderPane {
         formPane.add(patronymic, 1, 2);
         formPane.add(startingUsingAccountDate, 1, 3);
         formPane.add(endingUsingAccountDate, 1, 4);
-        formPane.add(degreeBox, 1, 5);
-        formPane.add(departmentBox, 1, 6);
-        formPane.add(positionBox, 1, 7);
-        formPane.add(compensationBox, 1, 8);
-        formPane.add(groupSelect, 1, 9);
-        formPane.add(isBlocked, 1, 10);
-        formPane.add(panelButtons, 1,11);
+        formPane.add(choicePane, 1, 5);
+        formPane.add(degreeBox, 1, 6);
+        formPane.add(departmentBox, 1, 7);
+        formPane.add(positionBox, 1, 8);
+        formPane.add(compensationBox, 1, 9);
+        formPane.add(groupSelect, 1, 10);
+        formPane.add(isBlocked, 1, 11);
+        formPane.add(errorInfo, 1, 12);
+        formPane.add(panelButtons, 1,13);
         formPane.setVisible(false);
         stackPane.getChildren().add(formPane);
         // Установка на таблицу свойства получения фокуса
@@ -313,29 +339,37 @@ public class UsersPane extends BorderPane {
         endingUsingAccountDate.setValue(selectedUser.getEnabledUntil().toLocalDate());
         isBlocked.setSelected(selectedUser.getIsBlocked());
 
-        if(selectedUser.getRole().equals("student")) {
+        if(selectedUser.getRole().equals("Студент")) {
+            studentChoice.fire();
             compensationBox.setValue(selectedUser.getReimbursement());
-            List<String> groupList = httpUtil.getGroupNames();
-            groupSelect.setItems(FXCollections.observableArrayList(groupList));
             groupSelect.setValue(selectedUser.getGroupName());
-            degreeBox.setDisable(true);
-            departmentBox.setDisable(true);
-            positionBox.setDisable(true);
-            compensationBox.setDisable(false);
-            groupSelect.setDisable(false);
         }
         else {
+            prepodChoice.fire();
             degreeBox.setValue(selectedUser.getAcademicDegree());
             departmentBox.setValue(selectedUser.getDepartment());
             positionBox.setValue(selectedUser.getAcademicTitle());
-            degreeBox.setDisable(false);
-            departmentBox.setDisable(false);
-            positionBox.setDisable(false);
-            compensationBox.setDisable(true);
-            groupSelect.setDisable(true);
         }
 
         formPane.setVisible(true);
+    }
+
+    private void enableStudentElements() {
+        List<String> groupList = httpUtil.getGroupNames();
+        groupSelect.setItems(FXCollections.observableArrayList(groupList));
+        degreeBox.setDisable(true);
+        departmentBox.setDisable(true);
+        positionBox.setDisable(true);
+        compensationBox.setDisable(false);
+        groupSelect.setDisable(false);
+    }
+
+    private void enablePrepodElements() {
+        degreeBox.setDisable(false);
+        departmentBox.setDisable(false);
+        positionBox.setDisable(false);
+        compensationBox.setDisable(true);
+        groupSelect.setDisable(true);
     }
 
     private void reloadUsers() {
@@ -355,12 +389,12 @@ public class UsersPane extends BorderPane {
     private void deleteMethod(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Подтвердите действие");
-        alert.setHeaderText("Удаление группы");
-        alert.setContentText("Вы точно намерены удалить данную группу?");
+        alert.setHeaderText("Удаление пользователя");
+        alert.setContentText("Вы точно намерены удалить данного пользователя?");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
-            boolean res = httpUtil.deleteGroupById(selectedUser.getId());
+            boolean res = httpUtil.deleteUserById(selectedUser.getId());
             if(res) {
                 selectedUser = null;
                 reloadUsers();
