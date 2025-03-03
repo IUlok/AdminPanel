@@ -10,7 +10,7 @@ import java.sql.Date;
 @ToString
 public class User {
 
-    private int id;
+    private Integer id;
 
     private String firstName;
 
@@ -34,5 +34,5 @@ public class User {
 
     private String academicDegree;
 
-    private boolean isBlocked;
+    private Boolean isBlocked;
 }
