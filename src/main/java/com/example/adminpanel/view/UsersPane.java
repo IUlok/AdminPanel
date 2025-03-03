@@ -77,6 +77,13 @@ public class UsersPane extends BorderPane {
         searchPanel.setVgap(20);
         searchPanel.getStyleClass().add("searchPanel");
         searchInput.setPrefSize(500,50);
+        searchInput.setFocusTraversable(true);
+        searchInput.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 1) searchInput.requestFocus();
+        });
+        searchInput.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ENTER) getUsersWithParamValue();
+        });
         searchInput.getStyleClass().add("searchInput");
         searchPanel.getChildren().add(searchInput);
 
@@ -267,6 +274,7 @@ public class UsersPane extends BorderPane {
             formPane.setVisible(false);
             reloadUsers();
         });
+
 
         Button closeButton = new Button("Закрыть");
         closeButton.setOnAction(e1 -> {

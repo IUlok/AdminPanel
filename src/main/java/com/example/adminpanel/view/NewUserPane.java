@@ -29,6 +29,7 @@ public class NewUserPane extends BorderPane {
     private final TextField firstName = new TextField();
     private final TextField lastName = new TextField();
     private final TextField patronymic = new TextField();
+    private final TextField email = new TextField();
 
     private final DatePicker startingUsingAccountDate = new DatePicker();
     private final DatePicker endingUsingAccountDate = new DatePicker();
@@ -96,6 +97,7 @@ public class NewUserPane extends BorderPane {
         firstName.setPromptText("Имя");
         lastName.setPromptText("Фамилия");
         patronymic.setPromptText("Отчество");
+        email.setPromptText("Эл. почта");
         startingUsingAccountDate.setValue(LocalDate.now());
         endingUsingAccountDate.setValue(LocalDate.now());
 
@@ -106,9 +108,10 @@ public class NewUserPane extends BorderPane {
         inputForm.add(lastName, 0, 0);
         inputForm.add(firstName, 0, 1);
         inputForm.add(patronymic, 0, 2);
-        inputForm.add(startingUsingAccountDate, 0, 3);
-        inputForm.add(endingUsingAccountDate, 0, 4);
-        inputForm.add(errorInfo, 0, 8);
+        inputForm.add(email, 0, 3);
+        inputForm.add(startingUsingAccountDate, 0, 4);
+        inputForm.add(endingUsingAccountDate, 0, 5);
+        inputForm.add(errorInfo, 0, 9);
 
         // Добавление формы на панель
         setCenter(inputForm);
@@ -154,10 +157,10 @@ public class NewUserPane extends BorderPane {
                 compensationBox = new ComboBox<>(compensation);
                 System.out.println(inputForm.getChildren().removeAll(degreeBox, positionBox, departmentBox));
                 Platform.runLater(() -> {
-                            if(!inputForm.getChildren().contains(facultiesSelect)) inputForm.add(facultiesSelect, 0, 5);
-                            if(!inputForm.getChildren().contains(groupSelect)) inputForm.add(groupSelect, 0, 6);
-                            if(!inputForm.getChildren().contains(compensationBox)) inputForm.add(compensationBox, 0, 7);
-                            if(!inputForm.getChildren().contains(ZAGlushka)) inputForm.add(ZAGlushka, 0, 8);
+                            if(!inputForm.getChildren().contains(facultiesSelect)) inputForm.add(facultiesSelect, 0, 6);
+                            if(!inputForm.getChildren().contains(groupSelect)) inputForm.add(groupSelect, 0, 7);
+                            if(!inputForm.getChildren().contains(compensationBox)) inputForm.add(compensationBox, 0, 8);
+                            if(!inputForm.getChildren().contains(ZAGlushka)) inputForm.add(ZAGlushka, 0, 9);
                         }
                 );
             }
@@ -190,9 +193,9 @@ public class NewUserPane extends BorderPane {
                 System.out.println(inputForm.getChildren().removeAll(compensationBox, facultiesSelect, groupSelect, ZAGlushka));
                 //for(Node i : inputForm.getChildren()) System.out.println(i + "\n");
                 Platform.runLater(()-> {
-                    if(!inputForm.getChildren().contains(departmentBox)) inputForm.add(departmentBox, 0, 5);
-                    if(!inputForm.getChildren().contains(positionBox)) inputForm.add(positionBox, 0, 6);
-                    if(!inputForm.getChildren().contains(degreeBox)) inputForm.add(degreeBox, 0, 7);
+                    if(!inputForm.getChildren().contains(departmentBox)) inputForm.add(departmentBox, 0, 6);
+                    if(!inputForm.getChildren().contains(positionBox)) inputForm.add(positionBox, 0, 7);
+                    if(!inputForm.getChildren().contains(degreeBox)) inputForm.add(degreeBox, 0, 8);
                 });
             }
             createButton.setOnAction(e -> {
@@ -220,6 +223,7 @@ public class NewUserPane extends BorderPane {
                 newUser.setPatronymic(patronymic.getText());
                 newUser.setEnabledFrom(Date.valueOf(startingUsingAccountDate.getValue()));
                 newUser.setEnabledUntil(Date.valueOf(endingUsingAccountDate.getValue()));
+                newUser.setEmail(email.getText());
 
                 if(isStudentForm){
                     newUser.setRole("Студент");

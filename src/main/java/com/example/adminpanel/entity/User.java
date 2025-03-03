@@ -35,4 +35,6 @@ public class User {
     private String academicDegree;
 
     private Boolean isBlocked;
+
+    private String email;
 }
