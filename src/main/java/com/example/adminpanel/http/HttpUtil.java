@@ -185,7 +185,10 @@ public class HttpUtil {
 				return null;
 			}
 
-			List<User> users = new Gson().fromJson(response.body(), new TypeToken<ArrayList<Group>>(){}.getType());
+			Gson gson = new GsonBuilder()
+					.setDateFormat("yyyy-MM-dd").create();
+
+			List<User> users = gson.fromJson(response.body(), new TypeToken<ArrayList<User>>(){}.getType());
 			System.out.println(users);
 			return users;
 

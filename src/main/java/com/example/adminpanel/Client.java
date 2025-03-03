@@ -2,6 +2,7 @@ package com.example.adminpanel;
 
 import com.example.adminpanel.view.GroupsPane;
 import com.example.adminpanel.view.NewUserPane;
+import com.example.adminpanel.view.UsersPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -126,7 +127,7 @@ public class Client extends GridPane {
             userControlPane.getStyleClass().add("userControl1");
             groupControlPane.getStyleClass().add("groupControl");
             // В правую панель устанавливается панель для работы с пользователями
-            rightPanel = new NewUserPane();
+            rightPanel = new UsersPane();
             add(rightPanel, 1, 0);
         });
 
