@@ -54,7 +54,7 @@ public class HttpUtil {
 		}
 	}
 
-	public boolean saveUser(User user) {
+	public HttpResponse<String> saveUser(User user) {
 		try {
 			Gson gson = new GsonBuilder()
 					.setDateFormat("yyyy-MM-dd").create();
@@ -67,7 +67,7 @@ public class HttpUtil {
 					.build();
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-			return response.statusCode() == 200;
+			return response;
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.net.http.HttpResponse;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -202,6 +203,8 @@ public class NewUserPane extends BorderPane {
                 List<String> unfilledFields = new ArrayList<>();
                 if(lastName.getText().isBlank()) unfilledFields.add("Фамилия");
                 if (firstName.getText().isBlank()) unfilledFields.add("Имя");
+                if (email.getText().isBlank()) unfilledFields.add("Эл. почта");
+                if (!email.getText().matches(".*@.*")) unfilledFields.add("Эл. почта корректно!");
 
                 if(isStudentForm){
                     if (groupSelect.getValue() == null) unfilledFields.add("Группа");
@@ -236,7 +239,17 @@ public class NewUserPane extends BorderPane {
                     newUser.setAcademicDegree(degreeBox.getValue());
                 }
 
-                System.out.println(httpUtil.saveUser(newUser));
+                HttpResponse<String> objectServerResponse = httpUtil.saveUser(newUser);
+                if (objectServerResponse.statusCode() == 200) {
+                    errorInfo.setFill(Color.GREEN);
+                    errorInfo.setText("Успешно!");
+                }
+
+                else {
+                    errorInfo.setFill(Color.RED);
+                    String errorMsg = objectServerResponse.body();
+                    errorInfo.setText("Ошибка!" + errorMsg);
+                }
             });
         };
         studentChoice.selectedProperty().addListener(changeListener);
